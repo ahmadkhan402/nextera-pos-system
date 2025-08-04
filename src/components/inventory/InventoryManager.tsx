@@ -3,6 +3,7 @@ import { Plus, Search, Edit, Trash2, Package, AlertTriangle, TrendingUp, Trendin
 import { Product } from '../../types';
 import { useApp } from '../../context/SupabaseAppContext';
 import { ProductModal } from './ProductModal';
+import { swalConfig } from '../../lib/sweetAlert';
 
 export function InventoryManager() {
   const { state } = useApp();
@@ -61,15 +62,18 @@ export function InventoryManager() {
   };
 
   const handleDeleteProduct = async (productId: string) => {
-    if (confirm('Are you sure you want to delete this product?')) {
+    const result = await swalConfig.deleteConfirm('product');
+    if (result.isConfirmed) {
       try {
+        swalConfig.loading('Deleting product...');
         const { productsService } = await import('../../lib/services');
         await productsService.delete(productId);
         // Re-fetch products or update state
         window.location.reload(); // Simple approach for now
+        swalConfig.success('Product deleted successfully!');
       } catch (error) {
         console.error('Error deleting product:', error);
-        alert('Failed to delete product. Please try again.');
+        swalConfig.error('Failed to delete product. Please try again.');
       }
     }
   };

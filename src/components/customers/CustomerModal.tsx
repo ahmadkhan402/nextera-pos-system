@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Customer } from '../../types';
 import { useApp } from '../../context/SupabaseAppContext';
+import { swalConfig } from '../../lib/sweetAlert';
 
 interface CustomerModalProps {
   isOpen: boolean;
@@ -47,24 +48,24 @@ export function CustomerModal({ isOpen, onClose, customer }: CustomerModalProps)
   const handleSubmit = async () => {
     // Validate required fields
     if (!formData.name.trim()) {
-      alert('Please enter customer name');
+      swalConfig.warning('Please enter customer name');
       return;
     }
 
     if (!formData.email.trim()) {
-      alert('Please enter email address');
+      swalConfig.warning('Please enter email address');
       return;
     }
 
     if (!formData.phone.trim()) {
-      alert('Please enter phone number');
+      swalConfig.warning('Please enter phone number');
       return;
     }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      alert('Please enter a valid email address');
+      swalConfig.warning('Please enter a valid email address');
       return;
     }
 
@@ -83,20 +84,23 @@ export function CustomerModal({ isOpen, onClose, customer }: CustomerModalProps)
     };
 
     try {
+      swalConfig.loading(`${customer ? 'Updating' : 'Creating'} customer...`);
       const { customersService } = await import('../../lib/services');
       
       if (customer) {
         await customersService.update(customerData.id, customerData);
         dispatch({ type: 'UPDATE_CUSTOMER', payload: customerData });
+        swalConfig.success('Customer updated successfully!');
       } else {
         const newCustomer = await customersService.create(customerData);
         dispatch({ type: 'ADD_CUSTOMER', payload: newCustomer });
+        swalConfig.success('Customer created successfully!');
       }
       
       onClose();
     } catch (error) {
       console.error('Error saving customer:', error);
-      alert('Failed to save customer. Please try again.');
+      swalConfig.error('Failed to save customer. Please try again.');
     }
   };
 

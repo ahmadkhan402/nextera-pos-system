@@ -4,6 +4,7 @@ import { User as UserType } from '../../types';
 import { useApp } from '../../context/SupabaseAppContext';
 import { usersService } from '../../lib/services';
 import { UserModal } from './UserModal';
+import { swalConfig } from '../../lib/sweetAlert';
 
 export function UserManager() {
   const { state, dispatch } = useApp();
@@ -25,19 +26,23 @@ export function UserManager() {
 
   const handleDeleteUser = async (userId: string) => {
     if (userId === state.currentUser?.id) {
-      alert('You cannot delete your own account');
+      swalConfig.warning('You cannot delete your own account');
       return;
     }
 
-    if (confirm('Are you sure you want to delete this user?')) {
+    const result = await swalConfig.deleteConfirm('user');
+    if (result.isConfirmed) {
       setLoading(true);
+      swalConfig.loading('Deleting user...');
       try {
         await usersService.delete(userId);
         dispatch({ type: 'SET_USERS', payload: state.users.filter(u => u.id !== userId) });
+        swalConfig.success('User deleted successfully!');
       } catch (error: any) {
-        alert(`Error deleting user: ${error.message}`);
+        swalConfig.error(`Error deleting user: ${error.message}`);
       } finally {
         setLoading(false);
+        swalConfig.close();
       }
     }
   };
@@ -49,21 +54,24 @@ export function UserManager() {
 
   const toggleUserStatus = async (user: UserType) => {
     if (user.id === state.currentUser?.id) {
-      alert('You cannot deactivate your own account');
+      swalConfig.warning('You cannot deactivate your own account');
       return;
     }
 
     setLoading(true);
+    swalConfig.loading(`${user.active ? 'Deactivating' : 'Activating'} user...`);
     try {
       const updatedUser = await usersService.update(user.id, { active: !user.active });
       dispatch({ 
         type: 'SET_USERS', 
         payload: state.users.map(u => u.id === user.id ? updatedUser : u)
       });
+      swalConfig.success(`User ${user.active ? 'deactivated' : 'activated'} successfully!`);
     } catch (error: any) {
-      alert(`Error updating user: ${error.message}`);
+      swalConfig.error(`Error updating user: ${error.message}`);
     } finally {
       setLoading(false);
+      swalConfig.close();
     }
   };
 

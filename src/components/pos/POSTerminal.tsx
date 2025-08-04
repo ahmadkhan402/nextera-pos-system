@@ -7,6 +7,7 @@ import { Product, Sale } from '../../types';
 import { useApp } from '../../context/SupabaseAppContext';
 import { useAuth } from '../../context/AuthContext';
 import { salesService } from '../../lib/services';
+import { swalConfig } from '../../lib/sweetAlert';
 
 export function POSTerminal() {
   const { state, dispatch } = useApp();
@@ -127,10 +128,10 @@ export function POSTerminal() {
         });
       }
 
-      alert('Draft sale saved successfully!');
+      swalConfig.success('Draft sale saved successfully!');
     } catch (error) {
       console.error('Error saving draft:', error);
-      alert('Failed to save draft. Please try again.');
+      swalConfig.error('Failed to save draft. Please try again.');
     }
   };
 

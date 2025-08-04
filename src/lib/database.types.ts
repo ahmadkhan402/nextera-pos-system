@@ -257,6 +257,7 @@ export interface Database {
           sku: string
           stock: number | null
           taxable: boolean | null
+          track_inventory: boolean | null
           unit: string | null
           updated_at: string | null
         }
@@ -277,6 +278,7 @@ export interface Database {
           sku: string
           stock?: number | null
           taxable?: boolean | null
+          track_inventory?: boolean | null
           unit?: string | null
           updated_at?: string | null
         }
@@ -297,6 +299,7 @@ export interface Database {
           sku?: string
           stock?: number | null
           taxable?: boolean | null
+          track_inventory?: boolean | null
           unit?: string | null
           updated_at?: string | null
         }

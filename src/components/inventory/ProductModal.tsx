@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Upload, Scale } from 'lucide-react';
+import { X, Scale } from 'lucide-react';
 import { Product, ProductBatch } from '../../types';
 import { useApp } from '../../context/SupabaseAppContext';
+import Swal from 'sweetalert2';
 
 interface ProductModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface ProductModalProps {
 
 export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
   const { dispatch } = useApp();
+  
   const [formData, setFormData] = useState({
     name: '',
     sku: '',
@@ -29,8 +31,8 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
     image: '',
     trackInventory: true,
   });
+  
   const [batches, setBatches] = useState<ProductBatch[]>([]);
-  const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (product) {
@@ -74,7 +76,6 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
       });
       setBatches([]);
     }
-    setImageFile(null);
   }, [product]);
 
   if (!isOpen) return null;
@@ -82,46 +83,86 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
   const handleSubmit = async () => {
     // Validate required fields
     if (!formData.name.trim()) {
-      alert('Please enter a product name');
-      return;
-    }
-
-    if (!formData.sku.trim()) {
-      alert('Please enter a SKU');
+      await Swal.fire({
+        title: 'Error!',
+        text: 'Please enter a product name',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
       return;
     }
 
     if (!formData.category.trim()) {
-      alert('Please enter a category');
+      await Swal.fire({
+        title: 'Error!',
+        text: 'Please enter a category',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
+
+    if (!formData.sku.trim()) {
+      await Swal.fire({
+        title: 'Error!',
+        text: 'Please enter a SKU',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
       return;
     }
 
     if (formData.isWeightBased) {
       if (!formData.pricePerUnit || parseFloat(formData.pricePerUnit) <= 0) {
-        alert('Please enter a valid price per unit for weight-based product');
+        await Swal.fire({
+          title: 'Error!',
+          text: 'Please enter a valid price per unit for weight-based product',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
         return;
       }
     } else {
       if (!formData.price || parseFloat(formData.price) <= 0) {
-        alert('Please enter a valid price');
+        await Swal.fire({
+          title: 'Error!',
+          text: 'Please enter a valid price',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
         return;
       }
     }
 
-    if (!formData.cost || parseFloat(formData.cost) <= 0) {
-      alert('Please enter a valid cost price');
+    if (!formData.cost || parseFloat(formData.cost) < 0) {
+      await Swal.fire({
+        title: 'Error!',
+        text: 'Please enter a valid cost price (or 0 if no cost)',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
       return;
     }
 
     // Only validate stock fields if inventory tracking is enabled
     if (formData.trackInventory) {
       if (!formData.stock || parseInt(formData.stock) < 0) {
-        alert('Please enter a valid stock quantity');
+        await Swal.fire({
+          title: 'Error!',
+          text: 'Please enter a valid stock quantity',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
         return;
       }
 
       if (!formData.minStock || parseInt(formData.minStock) < 0) {
-        alert('Please enter a valid minimum stock level');
+        await Swal.fire({
+          title: 'Error!',
+          text: 'Please enter a valid minimum stock level',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
         return;
       }
     }
@@ -133,7 +174,7 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
       barcode: formData.barcode || undefined,
       price: formData.isWeightBased ? 0 : parseFloat(formData.price),
       cost: parseFloat(formData.cost),
-      stock: formData.trackInventory ? parseInt(formData.stock) : 0,
+      stock: formData.trackInventory ? parseInt(formData.stock) : 999999,
       minStock: formData.trackInventory ? parseInt(formData.minStock) : 0,
       category: formData.category,
       description: formData.description,
@@ -155,14 +196,31 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
       if (product) {
         await productsService.update(productData.id, productData);
         dispatch({ type: 'UPDATE_PRODUCT', payload: productData });
+        await Swal.fire({
+          title: 'Success!',
+          text: 'Product updated successfully',
+          icon: 'success',
+          confirmButtonText: 'OK'
+        });
       } else {
         const newProduct = await productsService.create(productData);
         dispatch({ type: 'ADD_PRODUCT', payload: newProduct });
+        await Swal.fire({
+          title: 'Success!',
+          text: 'Product added successfully',
+          icon: 'success',
+          confirmButtonText: 'OK'
+        });
       }
       onClose();
     } catch (error) {
       console.error('Error saving product:', error);
-      alert('Failed to save product. Please try again.');
+      await Swal.fire({
+        title: 'Error!',
+        text: 'Failed to save product. Please try again.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
     }
   };
 
@@ -177,7 +235,6 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
-      setImageFile(file);
       const reader = new FileReader();
       reader.onload = (event) => {
         setFormData(prev => ({
@@ -194,7 +251,7 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
       id: Date.now().toString(),
       batchNumber: `BATCH-${Date.now().toString().slice(-6)}`,
       manufacturingDate: new Date(),
-      expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
+      expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
       quantity: 0,
       costPrice: parseFloat(formData.cost) || 0,
       supplierInfo: '',
@@ -228,7 +285,6 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
         </div>
 
         <div className="modal-body space-y-6">
-          {/* Basic Information */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -244,6 +300,21 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
                   required
                   className="input"
                   placeholder="Enter product name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Category *
+                </label>
+                <input
+                  type="text"
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  required
+                  className="input"
+                  placeholder="Enter category"
                 />
               </div>
 
@@ -276,42 +347,25 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
                 />
               </div>
 
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Category *
+                  Description
                 </label>
-                <input
-                  type="text"
-                  name="category"
-                  value={formData.category}
+                <textarea
+                  name="description"
+                  value={formData.description}
                   onChange={handleChange}
-                  required
-                  className="input"
-                  placeholder="Enter category"
+                  rows={3}
+                  className="textarea"
+                  placeholder="Enter product description"
                 />
               </div>
             </div>
-
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                rows={3}
-                className="textarea"
-                placeholder="Enter product description"
-              />
-            </div>
           </div>
 
-          {/* Pricing */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Pricing & Stock</h3>
             
-            {/* Weight-based toggle */}
             <div className="mb-4">
               <label className="flex items-center space-x-3">
                 <input
@@ -403,7 +457,6 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
               </div>
             </div>
 
-            {/* Inventory Tracking Toggle */}
             <div className="mt-6 mb-4">
               <label className="flex items-center space-x-3">
                 <input
@@ -422,7 +475,6 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
               </p>
             </div>
 
-            {/* Stock Fields - Only show if inventory tracking is enabled */}
             {formData.trackInventory && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -460,7 +512,6 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
             )}
           </div>
 
-          {/* Product Image */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Product Image</h3>
             <div className="space-y-4">
@@ -495,7 +546,6 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
             </div>
           </div>
 
-          {/* Batch Management */}
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -595,7 +645,6 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
             )}
           </div>
 
-          {/* Settings */}
           <div className="border-t border-gray-200 pt-6">
             <div className="flex space-x-6">
               <label className="flex items-center">

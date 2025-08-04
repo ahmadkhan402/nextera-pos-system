@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/SupabaseAppContext';
 import { useAuth } from '../../context/AuthContext';
+import { swalConfig } from '../../lib/sweetAlert';
 
 interface HeaderProps {
   currentView: string;
@@ -22,11 +23,19 @@ export function Header({ currentView, onViewChange }: HeaderProps) {
   };
 
   const handleLogout = async () => {
-    if (confirm('Are you sure you want to logout?')) {
+    const result = await swalConfig.confirm(
+      'Sign Out Confirmation',
+      'Are you sure you want to sign out? You will be logged out of the system.',
+      'Sign Out',
+      'Cancel'
+    );
+    
+    if (result.isConfirmed) {
       try {
         await signOut();
       } catch (error) {
         console.error('Error signing out:', error);
+        swalConfig.error('Failed to sign out. Please try again.');
       }
     }
   };

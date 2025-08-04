@@ -4,6 +4,7 @@ import { Discount } from '../../types';
 import { useApp } from '../../context/SupabaseAppContext';
 import { DiscountModal } from './DiscountModal';
 import { format } from 'date-fns';
+import { swalConfig } from '../../lib/sweetAlert';
 
 export function DiscountManager() {
   const { state, dispatch } = useApp();
@@ -22,14 +23,17 @@ export function DiscountManager() {
   };
 
   const handleDeleteDiscount = async (discountId: string) => {
-    if (confirm('Are you sure you want to delete this discount?')) {
+    const result = await swalConfig.deleteConfirm('discount');
+    if (result.isConfirmed) {
       try {
+        swalConfig.loading('Deleting discount...');
         const { discountsService } = await import('../../lib/services');
         await discountsService.delete(discountId);
         dispatch({ type: 'DELETE_DISCOUNT', payload: discountId });
+        swalConfig.success('Discount deleted successfully!');
       } catch (error) {
         console.error('Error deleting discount:', error);
-        alert('Failed to delete discount. Please try again.');
+        swalConfig.error('Failed to delete discount. Please try again.');
       }
     }
   };
@@ -41,6 +45,7 @@ export function DiscountManager() {
 
   const toggleDiscountStatus = async (discount: Discount) => {
     try {
+      swalConfig.loading(`${discount.active ? 'Deactivating' : 'Activating'} discount...`);
       const updatedDiscount = { ...discount, active: !discount.active };
       const { discountsService } = await import('../../lib/services');
       await discountsService.update(discount.id, updatedDiscount);
@@ -48,9 +53,10 @@ export function DiscountManager() {
         type: 'UPDATE_DISCOUNT',
         payload: updatedDiscount
       });
+      swalConfig.success(`Discount ${discount.active ? 'deactivated' : 'activated'} successfully!`);
     } catch (error) {
       console.error('Error updating discount:', error);
-      alert('Failed to update discount. Please try again.');
+      swalConfig.error('Failed to update discount. Please try again.');
     }
   };
 

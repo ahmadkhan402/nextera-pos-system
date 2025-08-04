@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Plus, Trash2 } from 'lucide-react';
 import { Discount, DiscountCondition } from '../../types';
 import { useApp } from '../../context/SupabaseAppContext';
+import { swalConfig } from '../../lib/sweetAlert';
 
 interface DiscountModalProps {
   isOpen: boolean;
@@ -69,17 +70,17 @@ export function DiscountModal({ isOpen, onClose, discount }: DiscountModalProps)
   const handleSubmit = async () => {
     // Validate required fields
     if (!formData.name.trim()) {
-      alert('Please enter a discount name');
+      swalConfig.warning('Please enter a discount name');
       return;
     }
 
     if (formData.type !== 'free_gift' && (!formData.value || parseFloat(formData.value) <= 0)) {
-      alert('Please enter a valid discount value');
+      swalConfig.warning('Please enter a valid discount value');
       return;
     }
 
     if (!formData.validFrom || !formData.validTo) {
-      alert('Please select valid dates');
+      swalConfig.warning('Please select valid dates');
       return;
     }
 
@@ -87,11 +88,11 @@ export function DiscountModal({ isOpen, onClose, discount }: DiscountModalProps)
     const specificProductsConditions = conditions.filter(c => c.type === 'specific_products');
     for (const condition of specificProductsConditions) {
       if (!condition.value || (Array.isArray(condition.value) && condition.value.length === 0)) {
-        alert('Please select at least one product for specific products conditions');
+        swalConfig.warning('Please select at least one product for specific products conditions');
         return;
       }
       if (!condition.minQuantity || condition.minQuantity < 1) {
-        alert('Minimum quantity must be at least 1 for specific products conditions');
+        swalConfig.warning('Minimum quantity must be at least 1 for specific products conditions');
         return;
       }
     }
@@ -102,13 +103,17 @@ export function DiscountModal({ isOpen, onClose, discount }: DiscountModalProps)
     const paymentMethodCondition = conditions.find(c => c.type === 'payment_method');
     
     if ((hasCardTypeCondition || hasBankNameCondition) && paymentMethodCondition && paymentMethodCondition.value !== 'card') {
-      alert('Card Type and Bank Name conditions can only be used with Card payment method. Please remove the conflicting payment method condition or change it to "Card".');
+      swalConfig.warning('Card Type and Bank Name conditions can only be used with Card payment method. Please remove the conflicting payment method condition or change it to "Card".');
       return;
     }
 
     if ((hasCardTypeCondition || hasBankNameCondition) && !paymentMethodCondition) {
-      const confirm = window.confirm('You have Card Type or Bank Name conditions but no Payment Method condition. These conditions will only apply when customers pay with cards. Do you want to continue?');
-      if (!confirm) return;
+      const result = await swalConfig.confirm(
+        'Card Payment Condition Warning',
+        'You have Card Type or Bank Name conditions but no Payment Method condition. These conditions will only apply when customers pay with cards. Do you want to continue?',
+        'Continue'
+      );
+      if (!result.isConfirmed) return;
     }
 
     const discountData: Discount = {
@@ -129,20 +134,23 @@ export function DiscountModal({ isOpen, onClose, discount }: DiscountModalProps)
     };
 
     try {
+      swalConfig.loading(`${discount ? 'Updating' : 'Creating'} discount...`);
       const { discountsService } = await import('../../lib/services');
       
       if (discount) {
         await discountsService.update(discount.id, discountData);
         dispatch({ type: 'UPDATE_DISCOUNT', payload: discountData });
+        swalConfig.success('Discount updated successfully!');
       } else {
         const newDiscount = await discountsService.create(discountData);
         dispatch({ type: 'ADD_DISCOUNT', payload: newDiscount });
+        swalConfig.success('Discount created successfully!');
       }
       
       onClose();
     } catch (error) {
       console.error('Error saving discount:', error);
-      alert('Failed to save discount. Please try again.');
+      swalConfig.error('Failed to save discount. Please try again.');
     }
   };
 

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Search, Plus, Package, Filter, Scale, X } from 'lucide-react';
-import { Product, CartItem } from '../../types';
+import { useState } from 'react';
+import { Search, Plus, Package, Scale, X } from 'lucide-react';
+import { Product } from '../../types';
 import { useApp } from '../../context/SupabaseAppContext';
 
 interface ProductGridProps {
@@ -190,8 +190,10 @@ interface ProductCardProps {
 
 function ProductCard({ product, onAddToCart, isTouchMode, currency }: ProductCardProps) {
   // Only check stock levels if inventory tracking is enabled
-  const isLowStock = product.trackInventory ? product.stock <= product.minStock : false;
-  const isOutOfStock = product.trackInventory ? product.stock === 0 : false;
+  // Default to true if trackInventory is undefined (for backwards compatibility)
+  const shouldTrackInventory = product.trackInventory !== false;
+  const isLowStock = shouldTrackInventory ? product.stock <= product.minStock : false;
+  const isOutOfStock = shouldTrackInventory ? product.stock === 0 : false;
 
   return (
     <div
@@ -233,7 +235,7 @@ function ProductCard({ product, onAddToCart, isTouchMode, currency }: ProductCar
           )}
           
           {isLowStock && !isOutOfStock && (
-            <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+            <div className="absolute bottom-2 right-2 bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
               Low Stock
             </div>
           )}
@@ -259,7 +261,7 @@ function ProductCard({ product, onAddToCart, isTouchMode, currency }: ProductCar
             <span className={`text-gray-500 ${
               isLowStock ? 'text-orange-600 font-medium' : ''
             } ${isTouchMode ? 'text-sm' : 'text-xs'}`}>
-              {product.trackInventory 
+              {shouldTrackInventory 
                 ? `Stock: ${product.stock}${product.isWeightBased ? product.unit : ''}`
                 : 'Unlimited stock'
               }

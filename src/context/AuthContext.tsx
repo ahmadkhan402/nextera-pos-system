@@ -3,6 +3,7 @@ import { User as SupabaseUser, Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { User } from '../types'
 import { usersService } from '../lib/services'
+import { swalConfig } from '../lib/sweetAlert'
 
 interface AuthContextType {
   user: SupabaseUser | null
@@ -16,6 +17,33 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+// Helper function to convert auth error messages to user-friendly text
+function getAuthErrorMessage(errorMessage: string): string {
+  if (errorMessage.includes('Invalid login credentials')) {
+    return 'Invalid email or password. Please check your credentials and try again.'
+  }
+  if (errorMessage.includes('Email not confirmed')) {
+    return 'Please check your email and click the confirmation link to activate your account.'
+  }
+  if (errorMessage.includes('User already registered')) {
+    return 'An account with this email already exists. Please sign in instead.'
+  }
+  if (errorMessage.includes('Password should be at least')) {
+    return 'Password must be at least 6 characters long.'
+  }
+  if (errorMessage.includes('Invalid email')) {
+    return 'Please enter a valid email address.'
+  }
+  if (errorMessage.includes('Too many requests')) {
+    return 'Too many attempts. Please wait a few minutes before trying again.'
+  }
+  if (errorMessage.includes('Network error')) {
+    return 'Network connection issue. Please check your internet connection.'
+  }
+  // Default fallback message
+  return 'An unexpected error occurred. Please try again.'
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<SupabaseUser | null>(null)
@@ -77,6 +105,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error('Error loading profile:', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Profile Error',
+        text: 'Failed to load user profile. Please try logging in again.',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 5000,
+        timerProgressBar: true
+      })
     } finally {
       setLoading(false)
     }
@@ -90,8 +128,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password,
       })
       if (error) throw error
-    } catch (error) {
+      
+      // Show success toast with our styled config
+      swalConfig.success('Welcome back! You have successfully signed in.');
+    } catch (error: any) {
       setLoading(false)
+      
+      // Show error toast with our styled config
+      swalConfig.error(`Sign In Failed: ${getAuthErrorMessage(error.message)}`);
       throw error
     }
   }
@@ -111,20 +155,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       })
       if (error) throw error
 
-      // Create user profile
+      // Create user profile in database
       if (data.user) {
-        await supabase.from('users').insert({
-          id: data.user.id,
-          username,
-          name,
-          email,
-          role: 'cashier', // Default role
-          permissions: ['pos_access'],
-          active: true
-        })
+        const { data: profileData, error: profileError } = await supabase
+          .from('users')
+          .insert({
+            id: data.user.id,
+            username,
+            name,
+            email,
+            role: 'cashier', // Default role
+            permissions: ['pos_access'],
+            active: true
+          })
+          .select()
+          .single()
+
+        if (profileError) {
+          console.error('Profile creation error:', profileError)
+          throw new Error(`Failed to create user profile: ${profileError.message}`)
+        }
+
+        // Set the profile data immediately
+        if (profileData) {
+          setProfile({
+            id: profileData.id,
+            username: profileData.username,
+            name: profileData.name,
+            email: profileData.email,
+            role: profileData.role as any,
+            permissions: profileData.permissions || [],
+            active: profileData.active ?? true,
+            lastLogin: profileData.last_login ? new Date(profileData.last_login) : undefined,
+            avatar: profileData.avatar || undefined
+          })
+        }
       }
-    } catch (error) {
+      
       setLoading(false)
+      
+      // Show success toast with our styled config
+      swalConfig.success('Account Created! Your account has been created successfully.');
+    } catch (error: any) {
+      setLoading(false)
+      
+      // Show error toast with our styled config
+      swalConfig.error(`Sign Up Failed: ${getAuthErrorMessage(error.message)}`);
       throw error
     }
   }
@@ -134,8 +210,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const { error } = await supabase.auth.signOut()
       if (error) throw error
-    } catch (error) {
+      
+      // Show success toast with our styled config
+      swalConfig.success('Signed Out! You have been successfully signed out.');
+    } catch (error: any) {
       setLoading(false)
+      
+      // Show error toast with our styled config
+      swalConfig.error(`Sign Out Failed: ${getAuthErrorMessage(error.message)}`);
       throw error
     }
   }

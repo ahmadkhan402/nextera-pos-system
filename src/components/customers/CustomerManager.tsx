@@ -4,6 +4,7 @@ import { Customer } from '../../types';
 import { useApp } from '../../context/SupabaseAppContext';
 import { CustomerModal } from './CustomerModal';
 import { CustomerDetailModal } from './CustomerDetailModal';
+import { swalConfig } from '../../lib/sweetAlert';
 
 export function CustomerManager() {
   const { state, dispatch } = useApp();
@@ -27,15 +28,18 @@ export function CustomerManager() {
     setViewingCustomer(customer);
   };
 
-  const handleDeleteCustomer = async (customerId: string) => {
-    if (confirm('Are you sure you want to delete this customer?')) {
+    const handleDeleteCustomer = async (customerId: string) => {
+    const result = await swalConfig.deleteConfirm('customer');
+    if (result.isConfirmed) {
       try {
+        swalConfig.loading('Deleting customer...');
         const { customersService } = await import('../../lib/services');
         await customersService.delete(customerId);
         dispatch({ type: 'DELETE_CUSTOMER', payload: customerId });
+        swalConfig.success('Customer deleted successfully!');
       } catch (error) {
         console.error('Error deleting customer:', error);
-        alert('Failed to delete customer. Please try again.');
+        swalConfig.error('Failed to delete customer. Please try again.');
       }
     }
   };

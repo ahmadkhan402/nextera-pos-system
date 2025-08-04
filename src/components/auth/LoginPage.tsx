@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Lock, User, Mail, Eye, EyeOff, AlertCircle, ShoppingCart } from 'lucide-react';
+import { Lock, User, Mail, Eye, EyeOff, ShoppingCart } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { swalConfig } from '../../lib/sweetAlert';
 
 export function LoginPage() {
   const { signIn, signUp, loading } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
   const [credentials, setCredentials] = useState({
     email: '',
     password: '',
@@ -16,12 +16,12 @@ export function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
 
     try {
       if (isSignUp) {
         if (!credentials.name.trim() || !credentials.username.trim()) {
-          setError('Name and username are required');
+          // Show validation error toast with our styled config
+          swalConfig.warning('Missing Information: Name and username are required');
           return;
         }
         await signUp(credentials.email, credentials.password, credentials.name, credentials.username);
@@ -29,13 +29,13 @@ export function LoginPage() {
         await signIn(credentials.email, credentials.password);
       }
     } catch (error: any) {
-      setError(error.message || 'An error occurred');
+      // Errors are now handled by the AuthContext with SweetAlert2 toasts
+      console.debug('Login error handled by AuthContext:', error.message);
     }
   };
 
   const resetForm = () => {
     setCredentials({ email: '', password: '', name: '', username: '' });
-    setError('');
   };
 
   const toggleMode = () => {
@@ -57,13 +57,6 @@ export function LoginPage() {
         </div>
 
         <div className="card p-8 shadow-lg border-0">
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center space-x-2 text-red-700">
-              <AlertCircle className="h-5 w-5 flex-shrink-0" />
-              <span className="text-sm">{error}</span>
-            </div>
-          )}
-
           <form onSubmit={handleSubmit} className="space-y-5">
             {isSignUp && (
               <>

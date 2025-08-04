@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Save, Store, DollarSign, Printer, Users, Globe, FileText } from 'lucide-react';
 import { useApp, useInvoiceStats } from '../../context/SupabaseAppContext';
 import { LogoUpload } from './LogoUpload';
+import { swalConfig } from '../../lib/sweetAlert';
 
 export function Settings() {
   const { state, dispatch } = useApp();
@@ -38,6 +39,7 @@ export function Settings() {
     e.preventDefault();
     
     try {
+      swalConfig.loading('Saving settings...');
       const { settingsService } = await import('../../lib/services');
       const updatedSettings = {
         ...formData,
@@ -50,10 +52,10 @@ export function Settings() {
         type: 'SET_SETTINGS',
         payload: updatedSettings
       });
-      alert('Settings saved successfully!');
+      swalConfig.success('Settings saved successfully!');
     } catch (error) {
       console.error('Error saving settings:', error);
-      alert('Failed to save settings. Please try again.');
+      swalConfig.error('Failed to save settings. Please try again.');
     }
   };
 

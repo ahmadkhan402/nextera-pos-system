@@ -4,6 +4,7 @@ import { User as UserType } from '../../types';
 import { useApp } from '../../context/SupabaseAppContext';
 import { usersService } from '../../lib/services';
 import { supabaseAdmin } from '../../lib/supabase';
+import { swalConfig } from '../../lib/sweetAlert';
 
 interface UserModalProps {
   isOpen: boolean;
@@ -73,7 +74,7 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
       } else {
         // Create new user
         if (!formData.password || formData.password.length < 6) {
-          alert('Password must be at least 6 characters long');
+          swalConfig.error('Password must be at least 6 characters long');
           return;
         }
 
@@ -123,7 +124,7 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
 
       onClose();
     } catch (error: any) {
-      alert(`Error ${user ? 'updating' : 'creating'} user: ${error.message}`);
+      swalConfig.error(`Error ${user ? 'updating' : 'creating'} user: ${error.message}`);
     } finally {
       setLoading(false);
     }

@@ -5,6 +5,7 @@ import { useApp, checkDiscountEligibility, useInvoiceGeneration } from '../../co
 import { useAuth } from '../../context/AuthContext';
 import { ReceiptPrint } from './ReceiptPrint';
 import { salesService, customersService, productsService } from '../../lib/services';
+import { swalConfig } from '../../lib/sweetAlert';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -348,7 +349,7 @@ export function CheckoutModal({ isOpen, onClose, onComplete }: CheckoutModalProp
     } catch (error) {
       console.error('Payment processing error:', error);
       setIsProcessing(false);
-      alert('Payment processing failed. Please try again.');
+      swalConfig.error('Payment processing failed. Please try again.');
     }
   };
 

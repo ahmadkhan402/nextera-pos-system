@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { Sale } from '../../types';
 import { CheckoutModal } from '../pos/CheckoutModal';
 import { salesService } from '../../lib/services';
+import { swalConfig } from '../../lib/sweetAlert';
 
 // Helper function to determine if a sale is a draft
 const isDraftSale = (sale: Sale) => {
@@ -366,7 +367,7 @@ function TransactionDetailModal({ transaction, onClose }: TransactionDetailModal
       onClose();
     } catch (error) {
       console.error('Error completing draft sale:', error);
-      alert('Failed to complete the draft sale. Please try again.');
+      swalConfig.error('Failed to complete the draft sale. Please try again.');
     }
   };
 
