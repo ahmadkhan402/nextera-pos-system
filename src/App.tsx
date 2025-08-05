@@ -32,21 +32,59 @@ function AppContent() {
   }
 
   const renderCurrentView = () => {
+    const userRole = state.currentUser?.role;
+    
+    // Restrict cashiers to POS only
+    if (userRole === 'cashier' && currentView !== 'pos') {
+      setCurrentView('pos');
+      return <POSTerminal />;
+    }
+    
     switch (currentView) {
       case 'pos':
         return <POSTerminal />;
       case 'transactions':
-        return <TransactionsManager />;
+        // Only allow admin and manager to access transactions
+        if (userRole === 'admin' || userRole === 'manager') {
+          return <TransactionsManager />;
+        }
+        setCurrentView('pos');
+        return <POSTerminal />;
       case 'inventory':
-        return <InventoryManager />;
+        // Only allow admin and manager to access inventory
+        if (userRole === 'admin' || userRole === 'manager') {
+          return <InventoryManager />;
+        }
+        setCurrentView('pos');
+        return <POSTerminal />;
       case 'customers':
-        return <CustomerManager />;
+        // Only allow admin and manager to access customers
+        if (userRole === 'admin' || userRole === 'manager') {
+          return <CustomerManager />;
+        }
+        setCurrentView('pos');
+        return <POSTerminal />;
       case 'reports':
-        return <ReportsManager />;
+        // Only allow admin and manager to access reports
+        if (userRole === 'admin' || userRole === 'manager') {
+          return <ReportsManager />;
+        }
+        setCurrentView('pos');
+        return <POSTerminal />;
       case 'discounts':
-        return <DiscountManager />;
+        // Only allow admin and manager to access discounts
+        if (userRole === 'admin' || userRole === 'manager') {
+          return <DiscountManager />;
+        }
+        setCurrentView('pos');
+        return <POSTerminal />;
       case 'users':
-        return <UserManager />;
+        // Only allow admin to access users
+        if (userRole === 'admin') {
+          return <UserManager />;
+        }
+        setCurrentView('pos');
+        return <POSTerminal />;
       case 'settings':
         return <Settings />;
       default:

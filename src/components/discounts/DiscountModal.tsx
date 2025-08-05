@@ -15,7 +15,7 @@ export function DiscountModal({ isOpen, onClose, discount }: DiscountModalProps)
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    type: 'percentage' as 'percentage' | 'fixed' | 'bogo' | 'free_gift',
+    type: 'percentage' as 'percentage' | 'fixed' | 'free_gift',
     value: '',
     minAmount: '',
     maxDiscount: '',
@@ -284,7 +284,6 @@ export function DiscountModal({ isOpen, onClose, discount }: DiscountModalProps)
                 >
                   <option value="percentage">Percentage Discount</option>
                   <option value="fixed">Fixed Amount Discount</option>
-                  <option value="bogo">Buy One Get One</option>
                   <option value="free_gift">Free Gift</option>
                 </select>
               </div>

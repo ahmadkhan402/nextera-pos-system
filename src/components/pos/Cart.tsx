@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Trash2, Plus, Minus, User, Percent, Save, FileText, ShoppingCart } from 'lucide-react';
+import { useState } from 'react';
+import { Trash2, Plus, Minus, User, Percent, FileText, ShoppingCart } from 'lucide-react';
 import { CartItem, Customer } from '../../types';
 import { useApp } from '../../context/SupabaseAppContext';
 
@@ -20,10 +20,13 @@ export function Cart({ onCheckout, onSaveDraft }: CartProps) {
       dispatch({ type: 'REMOVE_FROM_CART', payload: index });
     } else {
       const item = state.cart[index];
+      const price = item.product.isWeightBased 
+        ? (item.product.pricePerUnit || 0) * (item.weight || 1)
+        : item.product.price;
       const updatedItem = {
         ...item,
         quantity: newQuantity,
-        subtotal: (item.product.price * newQuantity) - (item.discount || 0)
+        subtotal: (price * newQuantity) - (item.discount || 0)
       };
       dispatch({ type: 'UPDATE_CART_ITEM', payload: { index, item: updatedItem } });
     }
@@ -35,10 +38,13 @@ export function Cart({ onCheckout, onSaveDraft }: CartProps) {
 
   const applyDiscount = (index: number, discount: number, discountType: 'percentage' | 'fixed') => {
     const item = state.cart[index];
+    const price = item.product.isWeightBased 
+      ? (item.product.pricePerUnit || 0) * (item.weight || 1)
+      : item.product.price;
     let discountAmount = 0;
     
     if (discountType === 'percentage') {
-      discountAmount = (item.product.price * item.quantity * discount) / 100;
+      discountAmount = (price * item.quantity * discount) / 100;
     } else {
       discountAmount = discount;
     }
@@ -47,7 +53,7 @@ export function Cart({ onCheckout, onSaveDraft }: CartProps) {
       ...item,
       discount: discountAmount,
       discountType,
-      subtotal: (item.product.price * item.quantity) - discountAmount
+      subtotal: (price * item.quantity) - discountAmount
     };
     
     dispatch({ type: 'UPDATE_CART_ITEM', payload: { index, item: updatedItem } });
@@ -65,7 +71,12 @@ export function Cart({ onCheckout, onSaveDraft }: CartProps) {
     customer.phone.includes(customerSearch)
   );
 
-  const subtotal = state.cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+  const subtotal = state.cart.reduce((sum, item) => {
+    const price = item.product.isWeightBased 
+      ? (item.product.pricePerUnit || 0) * (item.weight || 1)
+      : item.product.price;
+    return sum + (price * item.quantity);
+  }, 0);
   const totalDiscount = state.cart.reduce((sum, item) => sum + (item.discount || 0), 0);
   const taxAmount = (subtotal - totalDiscount) * (state.settings.taxRate / 100);
   const total = subtotal - totalDiscount + taxAmount;
@@ -272,7 +283,14 @@ function CartItemCard({ item, index, onUpdateQuantity, onRemove, onApplyDiscount
             {item.product.name}
           </h4>
           <p className={`text-gray-600 ${isTouchMode ? 'text-sm' : 'text-xs'}`}>
-            {currency} {item.product.price.toFixed(2)} each
+            {item.product.isWeightBased ? (
+              <>
+                {currency} {item.product.pricePerUnit?.toFixed(2)} per {item.product.unit}
+                {item.weight && <span className="ml-2">({item.weight} {item.product.unit})</span>}
+              </>
+            ) : (
+              <>{currency} {item.product.price.toFixed(2)} each</>
+            )}
           </p>
           {item.discount > 0 && (
             <p className="text-green-600 text-xs font-medium">

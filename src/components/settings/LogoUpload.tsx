@@ -1,18 +1,18 @@
 import React, { useState, useRef } from 'react';
-import { Upload, X, Image } from 'lucide-react';
-import { useApp } from '../../context/SupabaseAppContext';
+import { X, Image } from 'lucide-react';
 
 interface LogoUploadProps {
   currentLogo?: string;
   onLogoChange: (logo: string | undefined) => void;
+  disabled?: boolean;
 }
 
-export function LogoUpload({ currentLogo, onLogoChange }: LogoUploadProps) {
-  const { state } = useApp();
+export function LogoUpload({ currentLogo, onLogoChange, disabled = false }: LogoUploadProps) {
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (file: File) => {
+    if (disabled) return;
     if (file && file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -26,6 +26,7 @@ export function LogoUpload({ currentLogo, onLogoChange }: LogoUploadProps) {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragOver(false);
+    if (disabled) return;
     const files = Array.from(e.dataTransfer.files);
     if (files.length > 0) {
       handleFileSelect(files[0]);
@@ -50,6 +51,7 @@ export function LogoUpload({ currentLogo, onLogoChange }: LogoUploadProps) {
   };
 
   const removeLogo = () => {
+    if (disabled) return;
     onLogoChange(undefined);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -71,30 +73,37 @@ export function LogoUpload({ currentLogo, onLogoChange }: LogoUploadProps) {
           />
           <button
             onClick={removeLogo}
-            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+            disabled={disabled}
+            className={`absolute -top-2 -right-2 rounded-full p-1 transition-colors ${
+              disabled 
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                : 'bg-red-500 text-white hover:bg-red-600'
+            }`}
           >
             <X className="h-4 w-4" />
           </button>
         </div>
       ) : (
         <div
-          className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer ${
-            dragOver
-              ? 'border-blue-400 bg-blue-50'
-              : 'border-gray-300 hover:border-gray-400'
+          className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
+            disabled 
+              ? 'border-gray-200 bg-gray-100 cursor-not-allowed' 
+              : dragOver
+              ? 'border-blue-400 bg-blue-50 cursor-pointer'
+              : 'border-gray-300 hover:border-gray-400 cursor-pointer'
           }`}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => !disabled && fileInputRef.current?.click()}
         >
           <div className="flex flex-col items-center space-y-3">
             <div className="bg-gray-100 p-3 rounded-xl">
               <Image className="h-8 w-8 text-gray-400" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900">
-                Click to upload or drag and drop
+              <p className={`text-sm font-medium ${disabled ? 'text-gray-500' : 'text-gray-900'}`}>
+                {disabled ? 'Upload disabled' : 'Click to upload or drag and drop'}
               </p>
               <p className="text-xs text-gray-500">
                 PNG, JPG, GIF up to 2MB
@@ -109,6 +118,7 @@ export function LogoUpload({ currentLogo, onLogoChange }: LogoUploadProps) {
         type="file"
         accept="image/*"
         onChange={handleFileInput}
+        disabled={disabled}
         className="hidden"
       />
     </div>

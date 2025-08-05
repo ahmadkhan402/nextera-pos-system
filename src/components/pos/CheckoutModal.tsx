@@ -119,7 +119,12 @@ export function CheckoutModal({ isOpen, onClose, onComplete }: CheckoutModalProp
   };
 
   // Calculate totals
-  const subtotal = state.cart.reduce((sum, item) => sum + (item.product.price * (item.weight || item.quantity)), 0);
+  const subtotal = state.cart.reduce((sum, item) => {
+    const price = item.product.isWeightBased 
+      ? (item.product.pricePerUnit || 0) * (item.weight || 1)
+      : item.product.price;
+    return sum + (price * item.quantity);
+  }, 0);
   const manualDiscount = state.cart.reduce((sum, item) => sum + (item.discount || 0), 0);
 
   // Reset form when modal opens

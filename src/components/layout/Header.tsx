@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { 
   User, Settings, LogOut, ShoppingCart, Monitor, Smartphone, Bell, Menu, X, Percent,
   Receipt, Package, Users, BarChart3
@@ -26,8 +26,7 @@ export function Header({ currentView, onViewChange }: HeaderProps) {
     const result = await swalConfig.confirm(
       'Sign Out Confirmation',
       'Are you sure you want to sign out? You will be logged out of the system.',
-      'Sign Out',
-      'Cancel'
+      'Sign Out'
     );
     
     if (result.isConfirmed) {
@@ -50,8 +49,10 @@ export function Header({ currentView, onViewChange }: HeaderProps) {
     // POS - All roles can access
     items.push({ id: 'pos', label: 'POS', icon: ShoppingCart, color: 'text-blue-600' });
 
-    // Sales/Transactions - All roles can view
-    items.push({ id: 'transactions', label: 'Sales', icon: Receipt, color: 'text-green-600' });
+    // Sales/Transactions - Manager and Admin only (Cashiers should only have POS access)
+    if (role === 'admin' || role === 'manager') {
+      items.push({ id: 'transactions', label: 'Sales', icon: Receipt, color: 'text-green-600' });
+    }
 
     // Inventory - Manager and Admin can access
     if (role === 'admin' || role === 'manager') {

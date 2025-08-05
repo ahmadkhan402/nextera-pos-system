@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Save, Store, DollarSign, Printer, Users, Globe, FileText } from 'lucide-react';
+import { Save, Store, DollarSign, Printer, Users, Globe, FileText, Lock } from 'lucide-react';
 import { useApp, useInvoiceStats } from '../../context/SupabaseAppContext';
+import { useAuth } from '../../context/AuthContext';
 import { LogoUpload } from './LogoUpload';
 import { swalConfig } from '../../lib/sweetAlert';
 
 export function Settings() {
   const { state, dispatch } = useApp();
+  const { profile } = useAuth();
   const getInvoiceStats = useInvoiceStats();
   const invoiceStats = getInvoiceStats();
   const [formData, setFormData] = useState({
@@ -23,7 +25,11 @@ export function Settings() {
     invoiceCounter: state.settings.invoiceCounter?.toString() || '1000',
   });
 
+  // Check if user has permission to change settings
+  const canEditSettings = profile?.role === 'admin' || profile?.role === 'manager';
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    if (!canEditSettings) return;
     const { name, value, type } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -32,11 +38,17 @@ export function Settings() {
   };
 
   const handleLogoChange = (logo: string | undefined) => {
+    if (!canEditSettings) return;
     setFormData(prev => ({ ...prev, storeLogo: logo }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!canEditSettings) {
+      swalConfig.error('You do not have permission to change settings. Only administrators and managers can modify store settings.');
+      return;
+    }
     
     try {
       swalConfig.loading('Saving settings...');
@@ -65,6 +77,14 @@ export function Settings() {
         <div className="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50">
           <h1 className="text-3xl font-bold text-gray-900">System Settings</h1>
           <p className="text-gray-600 mt-2">Configure your POS system preferences and store information</p>
+          {!canEditSettings && (
+            <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-xl flex items-center space-x-3">
+              <Lock className="h-5 w-5 text-yellow-600" />
+              <p className="text-yellow-800 text-sm">
+                <strong>Read-only access:</strong> Only administrators and managers can modify these settings.
+              </p>
+            </div>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-10">
@@ -89,8 +109,9 @@ export function Settings() {
                       name="storeName"
                       value={formData.storeName}
                       onChange={handleChange}
+                      disabled={!canEditSettings}
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${!canEditSettings ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                     />
                   </div>
 
@@ -103,7 +124,8 @@ export function Settings() {
                       name="storePhone"
                       value={formData.storePhone}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      disabled={!canEditSettings}
+                      className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${!canEditSettings ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                     />
                   </div>
 
@@ -116,7 +138,8 @@ export function Settings() {
                       name="storeEmail"
                       value={formData.storeEmail}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      disabled={!canEditSettings}
+                      className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${!canEditSettings ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                     />
                   </div>
 
@@ -128,7 +151,8 @@ export function Settings() {
                       name="currency"
                       value={formData.currency}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      disabled={!canEditSettings}
+                      className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${!canEditSettings ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                     >
                       <option value="USD">USD - US Dollar</option>
                       <option value="EUR">EUR - Euro</option>
@@ -147,8 +171,9 @@ export function Settings() {
                     name="storeAddress"
                     value={formData.storeAddress}
                     onChange={handleChange}
+                    disabled={!canEditSettings}
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${!canEditSettings ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                   />
                 </div>
               </div>
@@ -157,6 +182,7 @@ export function Settings() {
                 <LogoUpload
                   currentLogo={formData.storeLogo}
                   onLogoChange={handleLogoChange}
+                  disabled={!canEditSettings}
                 />
               </div>
             </div>
@@ -182,7 +208,8 @@ export function Settings() {
                   name="taxRate"
                   value={formData.taxRate}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  disabled={!canEditSettings}
+                  className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${!canEditSettings ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 />
               </div>
             </div>
@@ -207,7 +234,8 @@ export function Settings() {
                   name="invoicePrefix"
                   value={formData.invoicePrefix}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  disabled={!canEditSettings}
+                  className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${!canEditSettings ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                   placeholder="INV"
                 />
               </div>
@@ -221,7 +249,8 @@ export function Settings() {
                   name="invoiceCounter"
                   value={formData.invoiceCounter}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  disabled={!canEditSettings}
+                  className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${!canEditSettings ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 />
                 <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                   <div className="text-xs text-blue-700">
@@ -252,7 +281,8 @@ export function Settings() {
                   name="theme"
                   value={formData.theme}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  disabled={!canEditSettings}
+                  className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${!canEditSettings ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 >
                   <option value="light">Light</option>
                   <option value="dark">Dark</option>
@@ -272,12 +302,13 @@ export function Settings() {
             </div>
             
             <div className="space-y-4">
-              <label className="flex items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">
+              <label className={`flex items-center p-4 border border-gray-200 rounded-xl transition-colors ${!canEditSettings ? 'bg-gray-50 cursor-not-allowed' : 'hover:bg-gray-50 cursor-pointer'}`}>
                 <input
                   type="checkbox"
                   name="receiptPrinter"
                   checked={formData.receiptPrinter}
                   onChange={handleChange}
+                  disabled={!canEditSettings}
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-5 w-5"
                 />
                 <div className="ml-4">
@@ -286,12 +317,13 @@ export function Settings() {
                 </div>
               </label>
 
-              <label className="flex items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">
+              <label className={`flex items-center p-4 border border-gray-200 rounded-xl transition-colors ${!canEditSettings ? 'bg-gray-50 cursor-not-allowed' : 'hover:bg-gray-50 cursor-pointer'}`}>
                 <input
                   type="checkbox"
                   name="autoBackup"
                   checked={formData.autoBackup}
                   onChange={handleChange}
+                  disabled={!canEditSettings}
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-5 w-5"
                 />
                 <div className="ml-4">
@@ -334,10 +366,15 @@ export function Settings() {
           <div className="flex justify-end pt-8 border-t border-gray-200">
             <button
               type="submit"
-              className="flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl"
+              disabled={!canEditSettings}
+              className={`flex items-center space-x-3 px-8 py-4 rounded-xl transition-all duration-200 font-semibold shadow-lg ${
+                canEditSettings 
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl' 
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
             >
               <Save className="h-5 w-5" />
-              <span>Save Settings</span>
+              <span>{canEditSettings ? 'Save Settings' : 'Access Denied'}</span>
             </button>
           </div>
         </form>

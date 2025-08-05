@@ -446,7 +446,13 @@ function TransactionDetailModal({ transaction, onClose }: TransactionDetailModal
                   <div>
                     <p className="font-medium text-gray-900">{item.product.name}</p>
                     <p className="text-sm text-gray-600">
-                      {state.settings.currency} {item.product.price.toFixed(2)} × {item.quantity}
+                      {state.settings.currency} {
+                        item.product.isWeightBased 
+                          ? (item.product.pricePerUnit || 0).toFixed(2)
+                          : item.product.price.toFixed(2)
+                      } {item.product.isWeightBased ? `per ${item.product.unit}` : ''} × {
+                        item.weight ? `${item.weight}${item.product.unit}` : item.quantity
+                      }
                     </p>
                   </div>
                   <p className="font-semibold text-gray-900">

@@ -1,4 +1,4 @@
-import { Plus, X, ShoppingCart } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { useApp } from '../../context/SupabaseAppContext';
 import { SalesTab } from '../../types';
 import { salesTabsService } from '../../lib/services';
@@ -84,46 +84,73 @@ export function SalesTabManager() {
     dispatch({ type: 'SET_ACTIVE_SALES_TAB', payload: tabId });
   };
 
+  const getItemCount = (tab: SalesTab) => {
+    return tab.cart.reduce((sum, item) => sum + item.quantity, 0);
+  };
+
   return (
-    <div className="bg-white border-b border-gray-100 px-4 lg:px-6 py-3">
-      <div className="flex items-center space-x-3 overflow-x-auto scrollbar-hide">
-        {state.salesTabs.map((tab) => (
-          <div
-            key={tab.id}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-xl border transition-all cursor-pointer min-w-0 flex-shrink-0 ${
-              state.activeSalesTab === tab.id
-                ? 'bg-blue-50 border-blue-200 text-blue-700'
-                : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
-            }`}
-            onClick={() => switchTab(tab.id)}
-          >
-            <ShoppingCart className="h-4 w-4 flex-shrink-0" />
-            <span className="text-sm font-medium truncate max-w-24">{tab.name}</span>
-            {tab.cart.length > 0 && (
-              <span className="badge badge-info text-xs flex-shrink-0">
-                {tab.cart.reduce((sum, item) => sum + item.quantity, 0)}
-              </span>
-            )}
-            {state.salesTabs.length > 1 && (
+    <div className="w-16 bg-white border-r border-gray-200 flex flex-col h-full">
+      {/* Sale Buttons with Rotated Text */}
+      <div className="flex-1 overflow-y-auto py-2 space-y-1">
+        {state.salesTabs.map((tab, index) => {
+          const isActive = state.activeSalesTab === tab.id;
+          const itemCount = getItemCount(tab);
+          const tabNumber = index + 1; // Correct sequential numbering
+          
+          return (
+            <div key={tab.id} className="relative flex flex-col items-center">
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  closeTab(tab.id);
-                }}
-                className="text-gray-400 hover:text-red-500 transition-colors flex-shrink-0 p-1 rounded-lg hover:bg-white"
+                onClick={() => switchTab(tab.id)}
+                className={`relative w-12 h-20 rounded-md text-xs font-medium transition-all group flex items-center justify-center ${
+                  isActive
+                    ? 'bg-blue-600 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-md'
+                }`}
               >
-                <X className="h-3 w-3" />
+                {/* Rotated Text Label */}
+                <div className="transform rotate-90 whitespace-nowrap">
+                  <span className="text-xs font-medium">
+                    Sale {tabNumber}
+                  </span>
+                </div>
+
+                {/* Item Count Badge */}
+                {itemCount > 0 && (
+                  <div className={`absolute -top-1 -right-1 w-4 h-4 rounded-full text-xs flex items-center justify-center ${
+                    isActive ? 'bg-white text-blue-600' : 'bg-blue-600 text-white'
+                  }`}>
+                    {itemCount}
+                  </div>
+                )}
+
+                {/* Close button */}
+                {state.salesTabs.length > 1 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      closeTab(tab.id);
+                    }}
+                    className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-colors ${
+                      isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                    }`}
+                  >
+                    <X className="h-2 w-2" />
+                  </button>
+                )}
               </button>
-            )}
-          </div>
-        ))}
-        
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Add New Sale Button */}
+      <div className="p-1 border-t border-gray-100">
         <button
           onClick={createNewTab}
-          className="btn btn-success btn-sm flex-shrink-0"
+          className="w-12 h-10 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors flex items-center justify-center mx-auto"
+          title="Add New Sale"
         >
           <Plus className="h-4 w-4" />
-          <span className="hidden sm:inline">New Sale</span>
         </button>
       </div>
     </div>

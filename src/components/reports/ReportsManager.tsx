@@ -163,7 +163,7 @@ export function ReportsManager() {
       }, 0);
 
       const stockValue = product.stock * (product.cost || 0);
-      const potentialRevenue = product.stock * product.price;
+      const potentialRevenue = product.stock * (product.isWeightBased ? (product.pricePerUnit || 0) : product.price);
       const turnoverRatio = product.stock > 0 ? soldQuantity / product.stock : 0;
 
       return {
@@ -176,13 +176,17 @@ export function ReportsManager() {
         stockStatus: product.stock <= product.minStock ? 'Low Stock' : 
                     product.stock === 0 ? 'Out of Stock' : 'In Stock',
         costPrice: product.cost || 0,
-        sellingPrice: product.price,
+        sellingPrice: product.isWeightBased ? (product.pricePerUnit || 0) : product.price,
         stockValue: stockValue,
         potentialRevenue: potentialRevenue,
         soldQuantity: soldQuantity,
         revenue: revenue,
         turnoverRatio: turnoverRatio,
-        profitMargin: product.cost ? ((product.price - product.cost) / product.price * 100) : 0,
+        profitMargin: product.cost ? (
+          product.isWeightBased 
+            ? (((product.pricePerUnit || 0) - product.cost) / (product.pricePerUnit || 1) * 100)
+            : ((product.price - product.cost) / product.price * 100)
+        ) : 0,
         active: product.active
       };
     });

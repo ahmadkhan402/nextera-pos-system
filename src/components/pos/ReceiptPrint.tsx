@@ -1,5 +1,6 @@
 import { Sale } from '../../types';
 import { useApp } from '../../context/SupabaseAppContext';
+import { useAuth } from '../../context/AuthContext';
 import { format } from 'date-fns';
 
 interface ReceiptPrintProps {
@@ -9,6 +10,7 @@ interface ReceiptPrintProps {
 
 export function ReceiptPrint({ sale, onClose }: ReceiptPrintProps) {
   const { state } = useApp();
+  const { profile } = useAuth();
 
   const handlePrint = () => {
     window.print();
@@ -62,7 +64,15 @@ export function ReceiptPrint({ sale, onClose }: ReceiptPrintProps) {
             </div>
             <div className="flex justify-between text-sm mb-2">
               <span>Cashier:</span>
-              <span>{sale.cashier}</span>
+              <span>
+                {profile ? (
+                  <span>
+                    {profile.name}
+                  </span>
+                ) : (
+                  sale.cashier
+                )}
+              </span>
             </div>
             {sale.customerName && (
               <div className="flex justify-between text-sm">
@@ -82,7 +92,11 @@ export function ReceiptPrint({ sale, onClose }: ReceiptPrintProps) {
                   </span>
                 </div>
                 <div className="text-xs text-gray-600 ml-2">
-                  {state.settings.currency} {item.product.price.toFixed(2)} × {
+                  {state.settings.currency} {
+                    item.product.isWeightBased 
+                      ? (item.product.pricePerUnit || 0).toFixed(2)
+                      : item.product.price.toFixed(2)
+                  } {item.product.isWeightBased ? `per ${item.product.unit}` : ''} × {
                     item.weight ? `${item.weight}${item.product.unit}` : item.quantity
                   }
                   {item.discount > 0 && (

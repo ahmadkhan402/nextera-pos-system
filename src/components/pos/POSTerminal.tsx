@@ -90,7 +90,12 @@ export function POSTerminal() {
     if (state.cart.length === 0) return;
 
     try {
-      const subtotal = state.cart.reduce((sum, item) => sum + (item.product.price * (item.weight || item.quantity)), 0);
+      const subtotal = state.cart.reduce((sum, item) => {
+        const price = item.product.isWeightBased 
+          ? (item.product.pricePerUnit || 0) * (item.weight || 1)
+          : item.product.price;
+        return sum + (price * item.quantity);
+      }, 0);
       const totalDiscount = state.cart.reduce((sum, item) => sum + (item.discount || 0), 0);
       const taxAmount = (subtotal - totalDiscount) * (state.settings.taxRate / 100);
       const total = subtotal - totalDiscount + taxAmount;
@@ -136,7 +141,7 @@ export function POSTerminal() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-50">
+    <div className="flex h-full bg-gray-50">
       <SalesTabManager />
       <div className="flex flex-1 overflow-hidden">
         <ProductGrid onAddToCart={addToCart} />

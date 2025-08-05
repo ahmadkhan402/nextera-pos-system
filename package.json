@@ -14,7 +14,7 @@
   ],
   "author": "Chandira Ekanayaka <info@iamchandira.com>",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"

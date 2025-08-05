@@ -56,7 +56,7 @@ A modern, feature-rich Point of Sale (POS) system built with React, TypeScript, 
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/iamchandira/nextera-pos-system
    cd pos
    ```
 
@@ -70,27 +70,59 @@ A modern, feature-rich Point of Sale (POS) system built with React, TypeScript, 
    ```env
    VITE_SUPABASE_URL=your_supabase_project_url
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   VITE_SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
    ```
 
 4. **Database Setup**
-   Run the following SQL commands in your Supabase SQL editor:
-
+   
+   **Option A: Complete Database Initialization (Recommended)**
+   
+   Run the complete database setup script in your Supabase SQL editor:
    ```sql
-   -- Add track_inventory column to products table
+   -- Execute the complete initialization script
+   -- Copy and paste the entire content from supabase_complete_init.sql
+   ```
+   
+   This script will:
+   - Create all required tables with proper structure
+   - Set up indexes for optimal performance
+   - Configure Row Level Security (RLS) policies
+   - Insert default data (categories, settings, sample discounts)
+   - Create necessary functions and triggers
+   
+   **Option B: Manual Database Setup**
+   
+   If you prefer manual setup, run these essential commands in your Supabase SQL editor:
+   ```sql
+   -- Enable required extensions
+   CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+   CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+   
+   -- Create core tables (see supabase_complete_init.sql for full schema)
+   -- Then add required columns and indexes:
    ALTER TABLE products 
-   ADD COLUMN track_inventory BOOLEAN DEFAULT true;
-
-   -- Create indexes for better performance
+   ADD COLUMN IF NOT EXISTS track_inventory BOOLEAN DEFAULT true;
+   
+   -- Create performance indexes
    CREATE INDEX IF NOT EXISTS idx_products_active ON products(active);
    CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
    CREATE INDEX IF NOT EXISTS idx_sales_timestamp ON sales(created_at);
    CREATE INDEX IF NOT EXISTS idx_customers_name ON customers(name);
    ```
 
-5. **Start Development Server**
+5. **Initial Application Setup**
+   
+   After database setup, configure the application:
    ```bash
+   # Start the development server
    npm run dev
    ```
+   
+   Navigate to the application and:
+   1. **Create Admin User**: Register the first user
+   2. **Configure Store Settings**: Go to Settings → Store Information
+   3. **Add Initial Products**: Go to Inventory → Add Product
+   4. **Create User Accounts**: Go to User Management to add cashiers/managers
 
 6. **Build for Production**
    ```bash
@@ -114,8 +146,13 @@ src/
 ├── context/            # React Context providers
 ├── lib/               # Utilities and services
 ├── types/             # TypeScript type definitions
-└── main.tsx          # Application entry point
+├── main.tsx          # Application entry point
+└── supabase_complete_init.sql  # Complete database initialization script
 ```
+
+## 🗄️ Database Files
+
+- **`supabase_complete_init.sql`** - Complete database setup script that creates all tables, indexes, functions, triggers, and default data. Run this in your Supabase SQL editor for complete setup.
 
 ## 🔧 Configuration
 
@@ -133,6 +170,7 @@ The application requires several tables in Supabase:
 ### Environment Variables
 - `VITE_SUPABASE_URL` - Your Supabase project URL
 - `VITE_SUPABASE_ANON_KEY` - Your Supabase anonymous key
+- `VITE_SUPABASE_SERVICE_ROLE_KEY` - Your Supabase service role key
 
 ## 📱 Usage
 
@@ -167,12 +205,6 @@ The application requires several tables in Supabase:
 
 ## 🎨 Customization
 
-### Themes
-The application supports multiple themes configurable in Settings:
-- Light mode (default)
-- Dark mode
-- High contrast mode
-
 ### Interface Modes
 - **Desktop Mode**: Optimized for mouse and keyboard
 - **Touch Mode**: Larger buttons and touch-friendly interface
@@ -182,31 +214,6 @@ The application supports multiple themes configurable in Settings:
 - Tax rate configuration
 - Invoice number formatting
 
-## 🚀 Deployment
-
-### Vercel (Recommended)
-1. Connect your repository to Vercel
-2. Add environment variables in Vercel dashboard
-3. Deploy automatically on push
-
-### Netlify
-1. Connect repository to Netlify
-2. Configure build settings:
-   - Build command: `npm run build`
-   - Publish directory: `dist`
-3. Add environment variables
-
-### Docker
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-EXPOSE 3000
-CMD ["npm", "run", "preview"]
-```
 
 ## 🔒 Security
 
@@ -276,11 +283,31 @@ npm run test
 For technical support or questions:
 1. Check the GitHub Issues page
 2. Review documentation
-3. Contact development team
+3. Contact developer
 
 ## 📄 License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+**License Terms:**
+
+This software is provided free of charge for personal, non-commercial use.
+
+Commercial use, including but not limited to use in proprietary software, services for a fee, or redistribution for profit, is not permitted without prior written consent from the author.
+
+To inquire about commercial licensing, please contact: **info@iamchandira.com**
+
+### Permitted Uses:
+- Personal learning and development
+- Educational purposes
+- Non-profit organizations
+- Open source projects (with attribution)
+
+### Restricted Uses:
+- Commercial deployment without license
+- Resale or redistribution for profit
+- Integration into paid software or services
+- Use in proprietary business applications
+
+For questions about licensing terms or to request commercial usage rights, please reach out to **info@iamchandira.com**.
 
 ## 🙏 Acknowledgments
 
@@ -293,5 +320,6 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ---
 
 **Version**: 1.0.0  
-**Last Updated**: July 2025  
-**Developed by**: Nextera Development Team
+**Last Updated**: August 2025  
+**Developed by**: Chandira Ekanayaka  
+**Contact**: info@iamchandira.com

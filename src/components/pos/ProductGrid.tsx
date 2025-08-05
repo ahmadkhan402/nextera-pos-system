@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Search, Plus, Package, Scale, X } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Search, Plus, Package, Scale, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Product } from '../../types';
 import { useApp } from '../../context/SupabaseAppContext';
 
@@ -13,6 +13,9 @@ export function ProductGrid({ onAddToCart }: ProductGridProps) {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showWeightModal, setShowWeightModal] = useState<Product | null>(null);
   const [weight, setWeight] = useState('');
+  const categoriesRef = useRef<HTMLDivElement>(null);
+  const [showLeftScroll, setShowLeftScroll] = useState(false);
+  const [showRightScroll, setShowRightScroll] = useState(false);
 
   const filteredProducts = state.products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -24,6 +27,38 @@ export function ProductGrid({ onAddToCart }: ProductGridProps) {
 
   const categories = ['All', ...Array.from(new Set(state.products.map(p => p.category)))];
   const isTouchMode = state.settings.interfaceMode === 'touch';
+
+  const checkScrollButtons = () => {
+    if (categoriesRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = categoriesRef.current;
+      setShowLeftScroll(scrollLeft > 0);
+      setShowRightScroll(scrollLeft < scrollWidth - clientWidth - 5); // 5px tolerance
+    }
+  };
+
+  useEffect(() => {
+    checkScrollButtons();
+    const categoriesElement = categoriesRef.current;
+    if (categoriesElement) {
+      categoriesElement.addEventListener('scroll', checkScrollButtons);
+      return () => categoriesElement.removeEventListener('scroll', checkScrollButtons);
+    }
+  }, [categories]);
+
+  const scrollCategories = (direction: 'left' | 'right') => {
+    if (categoriesRef.current) {
+      const scrollAmount = 200;
+      const currentScroll = categoriesRef.current.scrollLeft;
+      const targetScroll = direction === 'left' 
+        ? currentScroll - scrollAmount 
+        : currentScroll + scrollAmount;
+      
+      categoriesRef.current.scrollTo({
+        left: targetScroll,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   const handleProductClick = (product: Product) => {
     if (product.isWeightBased) {
@@ -59,20 +94,49 @@ export function ProductGrid({ onAddToCart }: ProductGridProps) {
               />
             </div>
             
-            <div className="flex overflow-x-auto space-x-2 lg:space-x-3 scrollbar-hide">
-              {categories.map((category) => (
+            <div className="relative flex items-center">
+              {/* Left scroll button */}
+              {showLeftScroll && (
                 <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`btn whitespace-nowrap transition-all ${
-                    selectedCategory === category
-                      ? 'btn-primary'
-                      : 'btn-secondary'
-                  } ${isTouchMode ? 'btn-lg touch-friendly' : 'btn-md'}`}
+                  onClick={() => scrollCategories('left')}
+                  className="absolute left-0 z-10 flex items-center justify-center w-8 h-8 bg-white border border-gray-200 rounded-full shadow-sm hover:bg-gray-50 transition-all"
+                  style={{ transform: 'translateX(-50%)' }}
                 >
-                  {category}
+                  <ChevronLeft className="h-4 w-4 text-gray-600" />
                 </button>
-              ))}
+              )}
+
+              {/* Categories container */}
+              <div 
+                ref={categoriesRef}
+                className="flex overflow-x-auto space-x-2 lg:space-x-3 max-w-xl scrollbar-hide scroll-smooth px-6"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
+                {categories.map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => setSelectedCategory(category)}
+                    className={`btn whitespace-nowrap transition-all flex-shrink-0 ${
+                      selectedCategory === category
+                        ? 'btn-primary'
+                        : 'btn-secondary'
+                    } ${isTouchMode ? 'btn-lg touch-friendly' : 'btn-md'}`}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+
+              {/* Right scroll button */}
+              {showRightScroll && (
+                <button
+                  onClick={() => scrollCategories('right')}
+                  className="absolute right-0 z-10 flex items-center justify-center w-8 h-8 bg-white border border-gray-200 rounded-full shadow-sm hover:bg-gray-50 transition-all"
+                  style={{ transform: 'translateX(50%)' }}
+                >
+                  <ChevronRight className="h-4 w-4 text-gray-600" />
+                </button>
+              )}
             </div>
           </div>
         </div>
