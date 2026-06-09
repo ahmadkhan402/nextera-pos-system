@@ -34,8 +34,8 @@ function AppContent() {
   const renderCurrentView = () => {
     const userRole = state.currentUser?.role;
     
-    // Restrict cashiers to POS only
-    if (userRole === 'cashier' && currentView !== 'pos') {
+    // Cashiers can view settings, but Settings itself controls edit permissions.
+    if (userRole === 'cashier' && currentView !== 'pos' && currentView !== 'settings') {
       setCurrentView('pos');
       return <POSTerminal />;
     }
@@ -93,7 +93,7 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.10),_transparent_32%),linear-gradient(135deg,_#f8fafc_0%,_#f1f5f9_50%,_#eef2ff_100%)] flex flex-col">
       <Header currentView={currentView} onViewChange={setCurrentView} />
       <main className="flex-1 overflow-hidden">
         {state.loading ? (

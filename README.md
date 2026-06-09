@@ -1,6 +1,6 @@
-# Nextera POS System
+# SnapSale POS System
 
-A modern, feature-rich Point of Sale (POS) system built with React, TypeScript, and Supabase. Designed for retail businesses of all sizes with comprehensive inventory management, sales tracking, customer management, and analytics.
+SnapSale is a modern, feature-rich Point of Sale (POS) system built with React, TypeScript, and Supabase. Designed for retail businesses of all sizes with comprehensive inventory management, sales tracking, customer management, and analytics.
 
 ## 🚀 Features
 
@@ -56,8 +56,8 @@ A modern, feature-rich Point of Sale (POS) system built with React, TypeScript, 
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/iamchandira/nextera-pos-system
-   cd pos
+   git clone https://github.com/iamchandira/snapsale-pos-system
+   cd snapsale-pos-system
    ```
 
 2. **Install dependencies**

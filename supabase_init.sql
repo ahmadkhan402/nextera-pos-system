@@ -1,5 +1,5 @@
 -- ================================================================
--- NEXTERA POS SYSTEM - COMPLETE DATABASE INITIALIZATION
+-- SNAPSALE POS SYSTEM - COMPLETE DATABASE INITIALIZATION
 -- Generated on: August 4, 2025
 -- Description: Complete Supabase database setup for POS system
 -- ================================================================
@@ -30,13 +30,13 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 -- App Settings Table (single row configuration)
 CREATE TABLE IF NOT EXISTS app_settings (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    store_name TEXT DEFAULT 'Nextera POS',
+    store_name TEXT DEFAULT 'SnapSale',
     store_address TEXT,
     store_phone TEXT,
     store_email TEXT,
     store_logo TEXT,
     tax_rate DECIMAL(5,4) DEFAULT 0.0000,
-    currency TEXT DEFAULT 'USD',
+    currency TEXT DEFAULT 'PKR',
     interface_mode TEXT DEFAULT 'touch' CHECK (interface_mode IN ('touch', 'traditional')),
     auto_backup BOOLEAN DEFAULT true,
     receipt_printer BOOLEAN DEFAULT false,
@@ -476,8 +476,8 @@ INSERT INTO app_settings (
     invoice_prefix, 
     invoice_counter
 ) VALUES (
-    'Nextera POS Store',
-    'USD',
+    'SnapSale',
+    'PKR',
     0.0875, -- 8.75% tax rate
     'touch',
     'light',
@@ -562,7 +562,7 @@ CREATE INDEX IF NOT EXISTS idx_customers_name_text ON customers(name text_patter
 -- Summary of created objects
 DO $$
 BEGIN
-    RAISE NOTICE '=== NEXTERA POS DATABASE SETUP COMPLETE ===';
+    RAISE NOTICE '=== SNAPSALE POS DATABASE SETUP COMPLETE ===';
     RAISE NOTICE 'Tables created: app_settings, categories, customers, suppliers, products, product_batches, discounts, users, sales, sales_tabs';
     RAISE NOTICE 'Indexes created: % performance optimization indexes', (
         SELECT COUNT(*) FROM pg_indexes WHERE schemaname = 'public'

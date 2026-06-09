@@ -511,6 +511,22 @@ export const discountsService = {
   }
 }
 
+const getStoreName = (storeName?: string | null) => {
+  if (!storeName || storeName.toLowerCase().includes('nextera')) {
+    return 'SnapSale'
+  }
+
+  return storeName
+}
+
+const getCurrency = (currency?: string | null) => {
+  if (!currency || currency === 'USD' || currency === 'LKR') {
+    return 'PKR'
+  }
+
+  return currency
+}
+
 // Settings Service
 export const settingsService = {
   async get(): Promise<AppSettings> {
@@ -523,13 +539,13 @@ export const settingsService = {
     if (error) throw error
 
     return {
-      storeName: data.store_name || 'Nextera POS',
+      storeName: getStoreName(data.store_name),
       storeAddress: data.store_address || '',
       storePhone: data.store_phone || '',
       storeEmail: data.store_email || '',
       storeLogo: data.store_logo || undefined,
       taxRate: data.tax_rate || 0,
-      currency: data.currency || 'LKR',
+      currency: getCurrency(data.currency),
       interfaceMode: data.interface_mode as any || 'touch',
       autoBackup: data.auto_backup ?? true,
       receiptPrinter: data.receipt_printer ?? true,
@@ -574,13 +590,13 @@ export const settingsService = {
     if (error) throw error
 
     return {
-      storeName: data.store_name || 'Nextera POS',
+      storeName: getStoreName(data.store_name),
       storeAddress: data.store_address || '',
       storePhone: data.store_phone || '',
       storeEmail: data.store_email || '',
       storeLogo: data.store_logo || undefined,
       taxRate: data.tax_rate || 0,
-      currency: data.currency || 'LKR',
+      currency: getCurrency(data.currency),
       interfaceMode: data.interface_mode as any || 'touch',
       autoBackup: data.auto_backup ?? true,
       receiptPrinter: data.receipt_printer ?? true,

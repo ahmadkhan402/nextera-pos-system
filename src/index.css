@@ -22,11 +22,11 @@
 
 @layer components {
   .card {
-    @apply bg-white rounded-2xl border border-gray-100 shadow-sm;
+    @apply bg-white/95 rounded-3xl border border-white shadow-sm shadow-slate-200/70;
   }
   
   .card-hover {
-    @apply transition-all duration-200 hover:shadow-md hover:border-gray-200;
+    @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-200/80 hover:border-blue-100;
   }
   
   .btn {
@@ -34,7 +34,7 @@
   }
   
   .btn-primary {
-    @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-sm hover:shadow-md;
+    @apply bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 focus:ring-blue-500 shadow-sm hover:shadow-md;
   }
   
   .btn-secondary {
@@ -62,7 +62,7 @@
   }
   
   .input {
-    @apply w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white;
+    @apply w-full px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/95 shadow-sm shadow-slate-100;
   }
   
   .input-sm {
@@ -70,11 +70,11 @@
   }
   
   .select {
-    @apply w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white;
+    @apply w-full px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/95 shadow-sm shadow-slate-100;
   }
   
   .textarea {
-    @apply w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white resize-none;
+    @apply w-full px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/95 resize-none shadow-sm shadow-slate-100;
   }
   
   .stat-card {
@@ -165,7 +165,7 @@
   }
   
   .nav-item-active {
-    @apply bg-blue-50 text-blue-700 font-medium;
+    @apply bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold shadow-lg shadow-blue-500/20;
   }
 }
 
@@ -219,12 +219,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: linear-gradient(180deg, #93c5fd, #6366f1);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: linear-gradient(180deg, #60a5fa, #4f46e5);
 }
 
 /* Animations */
@@ -443,10 +443,10 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: linear-gradient(180deg, #93c5fd, #6366f1);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: linear-gradient(180deg, #60a5fa, #4f46e5);
 }

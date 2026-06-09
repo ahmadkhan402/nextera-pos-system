@@ -40,6 +40,9 @@ export function Header({ currentView, onViewChange }: HeaderProps) {
   };
 
   const cartItemCount = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+  const brandName = state.settings.storeName?.toLowerCase().includes('nextera')
+    ? 'SnapSale'
+    : state.settings.storeName || 'SnapSale';
 
   // Role-based navigation with proper permissions
   const getNavigationItems = () => {
@@ -85,7 +88,7 @@ export function Header({ currentView, onViewChange }: HeaderProps) {
   const navigationItems = getNavigationItems();
 
   return (
-    <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
+    <header className="sticky top-0 z-40 border-b border-white/70 bg-white/85 shadow-sm shadow-slate-200/60 backdrop-blur-xl">
       <div className="px-4 lg:px-6">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo and Store Name */}
@@ -95,18 +98,18 @@ export function Header({ currentView, onViewChange }: HeaderProps) {
                 <img 
                   src={state.settings.storeLogo} 
                   alt="Store Logo" 
-                  className="h-8 w-8 lg:h-10 lg:w-10 object-contain rounded-lg"
+                  className="h-9 w-9 lg:h-11 lg:w-11 object-contain rounded-2xl shadow-md ring-1 ring-white"
                 />
               ) : (
-                <div className="h-8 w-8 lg:h-10 lg:w-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center">
+                <div className="h-9 w-9 lg:h-11 lg:w-11 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25">
                   <ShoppingCart className="h-4 w-4 lg:h-5 lg:w-5 text-white" />
                 </div>
               )}
               <div className="hidden sm:block">
-                <h1 className="text-lg lg:text-xl font-bold text-gray-900 truncate max-w-48">
-                  {state.settings.storeName}
+                <h1 className="text-lg lg:text-xl font-black tracking-tight text-gray-950 truncate max-w-48">
+                  {brandName}
                 </h1>
-                <p className="text-xs text-gray-500 hidden lg:block">Nextera POS System</p>
+                <p className="text-xs font-medium text-blue-600 hidden lg:block">SnapSale POS System</p>
               </div>
             </div>
             
@@ -116,13 +119,13 @@ export function Header({ currentView, onViewChange }: HeaderProps) {
                 <button
                   key={item.id}
                   onClick={() => onViewChange(item.id)}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center space-x-2 px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all duration-200 ${
                     currentView === item.id
-                      ? 'bg-blue-50 text-blue-700 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/20'
+                      : 'text-gray-600 hover:text-gray-950 hover:bg-white hover:shadow-sm'
                   }`}
                 >
-                  <item.icon className={`h-4 w-4 ${currentView === item.id ? 'text-blue-600' : item.color}`} />
+                  <item.icon className={`h-4 w-4 ${currentView === item.id ? 'text-white' : item.color}`} />
                   <span>{item.label}</span>
                 </button>
               ))}
@@ -134,7 +137,7 @@ export function Header({ currentView, onViewChange }: HeaderProps) {
             {/* Interface Mode Toggle - Hidden on mobile */}
             <button
               onClick={toggleInterfaceMode}
-              className="hidden md:flex items-center space-x-2 px-3 py-2 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors text-sm"
+              className="hidden md:flex items-center space-x-2 px-3 py-2 rounded-2xl bg-slate-100/80 hover:bg-white hover:shadow-sm transition-all text-sm font-medium text-slate-700"
               title={`Switch to ${state.settings.interfaceMode === 'touch' ? 'Traditional' : 'Touch'} Mode`}
             >
               {state.settings.interfaceMode === 'touch' ? (
@@ -149,14 +152,14 @@ export function Header({ currentView, onViewChange }: HeaderProps) {
 
             {/* Cart Indicator */}
             {currentView === 'pos' && cartItemCount > 0 && (
-              <div className="flex items-center space-x-2 px-3 py-2 rounded-xl bg-blue-50 text-blue-700">
+              <div className="flex items-center space-x-2 px-3 py-2 rounded-2xl bg-blue-50 text-blue-700 shadow-sm">
                 <ShoppingCart className="h-4 w-4" />
                 <span className="font-semibold text-sm">{cartItemCount}</span>
               </div>
             )}
 
             {/* Notifications */}
-            <button className="p-2 rounded-xl text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors relative">
+            <button className="p-2 rounded-2xl text-gray-500 hover:text-gray-700 hover:bg-white hover:shadow-sm transition-all relative">
               <Bell className="h-5 w-5" />
               <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
             </button>
@@ -164,30 +167,34 @@ export function Header({ currentView, onViewChange }: HeaderProps) {
             {/* User Menu */}
             <div className="flex items-center space-x-3">
               <div className="hidden lg:block text-right">
-                <p className="text-sm font-semibold text-gray-900 truncate max-w-32">
+                <p className="text-sm font-bold text-gray-900 truncate max-w-32">
                   {state.currentUser?.name}
                 </p>
-                <p className="text-xs text-gray-500 capitalize">
+                <p className="text-xs font-medium text-blue-600 capitalize">
                   {state.currentUser?.role}
                 </p>
               </div>
               
               <div className="flex items-center space-x-2">
-                <div className="h-8 w-8 lg:h-9 lg:w-9 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                <div className="h-8 w-8 lg:h-9 lg:w-9 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-md shadow-blue-500/20">
                   <User className="h-4 w-4 lg:h-5 lg:w-5 text-white" />
                 </div>
                 
                 <div className="hidden md:flex items-center space-x-1">
                   <button
                     onClick={() => onViewChange('settings')}
-                    className="p-2 rounded-xl text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors"
+                    className={`p-2 rounded-2xl transition-all ${
+                      currentView === 'settings'
+                        ? 'bg-blue-50 text-blue-700 shadow-sm'
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-white hover:shadow-sm'
+                    }`}
                   >
                     <Settings className="h-4 w-4" />
                   </button>
                   
                   <button
                     onClick={handleLogout}
-                    className="p-2 rounded-xl text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                    className="p-2 rounded-2xl text-gray-500 hover:text-red-600 hover:bg-red-50 transition-all"
                   >
                     <LogOut className="h-4 w-4" />
                   </button>
@@ -198,7 +205,7 @@ export function Header({ currentView, onViewChange }: HeaderProps) {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setShowMobileMenu(!showMobileMenu)}
-              className="xl:hidden p-2 rounded-xl text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors"
+              className="xl:hidden p-2 rounded-2xl text-gray-500 hover:text-gray-700 hover:bg-white hover:shadow-sm transition-all"
             >
               {showMobileMenu ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -216,13 +223,13 @@ export function Header({ currentView, onViewChange }: HeaderProps) {
                     onViewChange(item.id);
                     setShowMobileMenu(false);
                   }}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${
                     currentView === item.id
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/20'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-white'
                   }`}
                 >
-                  <item.icon className={`h-5 w-5 ${currentView === item.id ? 'text-blue-600' : item.color}`} />
+                  <item.icon className={`h-5 w-5 ${currentView === item.id ? 'text-white' : item.color}`} />
                   <span>{item.label}</span>
                 </button>
               ))}
@@ -233,15 +240,19 @@ export function Header({ currentView, onViewChange }: HeaderProps) {
                     onViewChange('settings');
                     setShowMobileMenu(false);
                   }}
-                  className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-200"
+                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${
+                    currentView === 'settings'
+                      ? 'bg-blue-50 text-blue-700'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-white'
+                  }`}
                 >
-                  <Settings className="h-5 w-5 text-gray-500" />
+                  <Settings className={`h-5 w-5 ${currentView === 'settings' ? 'text-blue-600' : 'text-gray-500'}`} />
                   <span>Settings</span>
                 </button>
                 
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-all duration-200"
+                  className="w-full flex items-center space-x-3 px-4 py-3 rounded-2xl text-sm font-semibold text-red-600 hover:bg-red-50 transition-all duration-200"
                 >
                   <LogOut className="h-5 w-5" />
                   <span>Logout</span>

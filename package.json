@@ -1,9 +1,9 @@
 {
-  "name": "nextera-pos-system",
+  "name": "snapsale-pos-system",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "A modern POS system built with React and Supabase",
+  "description": "SnapSale POS built with React and Supabase",
   "keywords": [
     "react",
     "supabase",

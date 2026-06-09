@@ -59,12 +59,12 @@ const initialState: AppState = {
   currentUser: null,
   selectedCustomer: null,
   settings: {
-    storeName: 'Nextera POS',
+    storeName: 'SnapSale',
     storeAddress: '123 Business Street, Colombo 03, Sri Lanka',
     storePhone: '+94 11 234 5678',
-    storeEmail: 'info@nexterapos.lk',
+    storeEmail: 'hello@snapsale.lk',
     taxRate: 0,
-    currency: 'LKR',
+    currency: 'PKR',
     interfaceMode: 'touch',
     autoBackup: true,
     receiptPrinter: true,
@@ -431,7 +431,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         {
           id: '3',
           name: 'Card Payment Bonus',
-          description: 'Free tea with card payments over LKR 1500',
+          description: 'Free tea with card payments over PKR 1500',
           type: 'free_gift',
           value: 0,
           conditions: [
