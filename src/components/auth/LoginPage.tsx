@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, User, Mail, Eye, EyeOff, ShoppingCart } from 'lucide-react';
+import { Lock, User, Mail, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { swalConfig } from '../../lib/sweetAlert';
 
@@ -49,10 +49,18 @@ export function LoginPage() {
       <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-indigo-300/30 blur-3xl" />
       <div className="relative w-full max-w-md animate-fade-in">
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-3xl mb-4 shadow-xl shadow-blue-500/25">
-            <ShoppingCart className="h-8 w-8 text-white" />
+          <div className="mb-4 inline-flex flex-col items-center rounded-[2rem] bg-white/90 px-8 py-6 shadow-2xl shadow-blue-950/10 ring-1 ring-white/80">
+            <img
+              src="/snapsale-icon.png"
+              alt="SnapSale"
+              className="h-24 w-24 rounded-3xl object-contain"
+            />
+            <div className="mt-3 flex items-baseline">
+              <span className="text-5xl font-black tracking-tight text-blue-700">snap</span>
+              <span className="text-5xl font-black tracking-tight text-emerald-600">$</span>
+              <span className="text-5xl font-black tracking-tight text-emerald-600">ale</span>
+            </div>
           </div>
-          <h1 className="text-4xl font-black tracking-tight text-gray-950 mb-2">SnapSale</h1>
           <p className="text-sm font-medium text-blue-700 mb-2">Fast checkout. Clear inventory. Beautiful sales.</p>
           <p className="text-gray-600">
             {isSignUp ? 'Create your SnapSale account' : 'Welcome back! Please sign in'}

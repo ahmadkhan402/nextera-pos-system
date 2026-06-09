@@ -81,22 +81,22 @@ export function Cart({ onCheckout, onSaveDraft }: CartProps) {
   const taxAmount = (subtotal - totalDiscount) * (state.settings.taxRate / 100);
   const total = subtotal - totalDiscount + taxAmount;
 
-  // Debug: Log current tax rate (remove this in production)
-  console.log('Current tax rate:', state.settings.taxRate);
-
   return (
-    <div className={`bg-white border-l border-gray-100 flex flex-col h-screen ${
+    <div className={`flex h-full max-w-full flex-col overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-xl shadow-slate-200/60 ${
       isTouchMode ? 'w-96' : 'w-80'
-    } max-w-full`}>
+    }`}>
       {/* Cart Header */}
-      <div className="p-4 lg:p-6 border-b border-gray-100 flex-shrink-0">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className={`font-bold text-gray-900 ${isTouchMode ? 'text-xl' : 'text-lg'}`}>
-            Shopping Cart
-          </h2>
+      <div className="flex-shrink-0 border-b border-slate-100 bg-white p-4 lg:p-5">
+        <div className="mb-5 flex items-center justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-600">Checkout</p>
+            <h2 className={`font-black text-gray-900 ${isTouchMode ? 'text-xl' : 'text-lg'}`}>
+              Cart
+            </h2>
+          </div>
           <div className="flex items-center space-x-2">
-            <ShoppingCart className="h-5 w-5 text-gray-400" />
-            <span className="badge badge-info">
+            <ShoppingCart className="h-5 w-5 text-blue-500" />
+            <span className="badge bg-slate-950 text-white">
               {state.cart.length} items
             </span>
           </div>
@@ -105,7 +105,7 @@ export function Cart({ onCheckout, onSaveDraft }: CartProps) {
         {/* Customer Selection */}
         <div className="relative">
           {state.selectedCustomer ? (
-            <div className="card p-4 border-green-200 bg-green-50">
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
               <div className="flex items-center justify-between">
                 <div className="min-w-0 flex-1">
                   <p className={`font-medium text-green-800 truncate ${isTouchMode ? 'text-base' : 'text-sm'}`}>
@@ -126,7 +126,7 @@ export function Cart({ onCheckout, onSaveDraft }: CartProps) {
           ) : (
             <button
               onClick={() => setShowCustomerSearch(true)}
-              className={`btn btn-secondary w-full ${
+              className={`btn w-full border border-slate-200 bg-slate-50 text-slate-700 hover:bg-white ${
                 isTouchMode ? 'btn-lg touch-friendly' : 'btn-md'
               }`}
             >
@@ -137,7 +137,7 @@ export function Cart({ onCheckout, onSaveDraft }: CartProps) {
 
           {/* Customer Search Dropdown */}
           {showCustomerSearch && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-2xl shadow-lg z-50 max-h-64 overflow-hidden animate-slide-up">
+            <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-64 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl shadow-slate-200/80 animate-slide-up">
               <div className="p-4">
                 <input
                   type="text"
@@ -153,7 +153,7 @@ export function Cart({ onCheckout, onSaveDraft }: CartProps) {
                   <button
                     key={customer.id}
                     onClick={() => selectCustomer(customer)}
-                    className="w-full text-left p-4 hover:bg-gray-50 border-t border-gray-100 transition-colors"
+                    className="w-full border-t border-gray-100 p-4 text-left transition-colors hover:bg-blue-50"
                   >
                     <p className="font-medium text-sm truncate">{customer.name}</p>
                     <p className="text-xs text-gray-600 truncate">{customer.email}</p>
@@ -171,16 +171,16 @@ export function Cart({ onCheckout, onSaveDraft }: CartProps) {
       </div>
 
       {/* Cart Items */}
-      <div className="flex-1 min-h-0 overflow-y-auto p-4 lg:p-6 space-y-4" style={{
+      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-slate-50/70 p-4 lg:p-5" style={{
         scrollbarWidth: 'thin',
         scrollbarColor: '#d1d5db #f3f4f6'
       }}>
         {state.cart.length === 0 ? (
           <div className="text-center py-12">
-            <div className="bg-gray-100 p-6 rounded-3xl inline-block mb-4">
-              <ShoppingCart className="h-12 w-12 text-gray-400" />
+            <div className="mb-4 inline-block rounded-3xl bg-white p-6 shadow-sm">
+              <ShoppingCart className="h-12 w-12 text-blue-400" />
             </div>
-            <p className="text-gray-500 font-medium">Cart is empty</p>
+            <p className="font-bold text-gray-600">Cart is empty</p>
             <p className="text-gray-400 text-sm mt-1">Add products to get started</p>
           </div>
         ) : (
@@ -201,8 +201,8 @@ export function Cart({ onCheckout, onSaveDraft }: CartProps) {
 
       {/* Cart Summary */}
       {state.cart.length > 0 && (
-        <div className="border-t border-gray-100 p-4 lg:p-6 space-y-6 bg-gray-50 flex-shrink-0">
-          <div className="space-y-3">
+        <div className="flex-shrink-0 space-y-5 border-t border-slate-100 bg-white p-4 lg:p-5">
+          <div className="space-y-3 rounded-3xl bg-slate-50 p-4">
             <div className="flex justify-between text-gray-600">
               <span>Subtotal:</span>
               <span className="font-medium">{state.settings.currency} {subtotal.toFixed(2)}</span>
@@ -217,9 +217,9 @@ export function Cart({ onCheckout, onSaveDraft }: CartProps) {
               <span>Tax ({state.settings.taxRate}%):</span>
               <span className="font-medium">{state.settings.currency} {taxAmount.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-xl font-bold text-gray-900 pt-3 border-t border-gray-200">
+            <div className="flex justify-between border-t border-gray-200 pt-3 text-xl font-black text-gray-900">
               <span>Total:</span>
-              <span>{state.settings.currency} {total.toFixed(2)}</span>
+              <span className="text-blue-700">{state.settings.currency} {total.toFixed(2)}</span>
             </div>
           </div>
 
@@ -227,7 +227,7 @@ export function Cart({ onCheckout, onSaveDraft }: CartProps) {
             <button
               onClick={onCheckout}
               disabled={state.cart.length === 0}
-              className={`btn btn-success w-full ${
+              className={`btn w-full bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 hover:bg-emerald-700 ${
                 isTouchMode ? 'btn-lg touch-friendly' : 'btn-lg'
               }`}
             >
@@ -237,7 +237,7 @@ export function Cart({ onCheckout, onSaveDraft }: CartProps) {
             <button
               onClick={onSaveDraft}
               disabled={state.cart.length === 0}
-              className={`btn btn-secondary w-full ${
+              className={`btn w-full border border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200 ${
                 isTouchMode ? 'btn-md touch-friendly' : 'btn-md'
               }`}
             >
@@ -276,13 +276,13 @@ function CartItemCard({ item, index, onUpdateQuantity, onRemove, onApplyDiscount
   };
 
   return (
-    <div className="card p-4 space-y-4">
+    <div className="card space-y-4 border-blue-50 p-4 shadow-sm">
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
-          <h4 className={`font-medium text-gray-900 truncate ${isTouchMode ? 'text-base' : 'text-sm'}`}>
+          <h4 className={`truncate font-bold text-gray-900 ${isTouchMode ? 'text-base' : 'text-sm'}`}>
             {item.product.name}
           </h4>
-          <p className={`text-gray-600 ${isTouchMode ? 'text-sm' : 'text-xs'}`}>
+          <p className={`font-medium text-gray-500 ${isTouchMode ? 'text-sm' : 'text-xs'}`}>
             {item.product.isWeightBased ? (
               <>
                 {currency} {item.product.pricePerUnit?.toFixed(2)} per {item.product.unit}
@@ -300,30 +300,30 @@ function CartItemCard({ item, index, onUpdateQuantity, onRemove, onApplyDiscount
         </div>
         <button
           onClick={() => onRemove(index)}
-          className="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors flex-shrink-0"
+          className="flex-shrink-0 rounded-2xl p-2 text-red-500 transition-colors hover:bg-red-50 hover:text-red-700"
         >
           <Trash2 className="h-4 w-4" />
         </button>
       </div>
 
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-3 rounded-2xl bg-slate-50 p-1">
           <button
             onClick={() => onUpdateQuantity(index, item.quantity - 1)}
-            className={`btn btn-secondary ${
+            className={`btn btn-secondary bg-white ${
               isTouchMode ? 'touch-friendly' : 'w-8 h-8'
             } flex items-center justify-center`}
           >
             <Minus className="h-4 w-4" />
           </button>
-          <span className={`font-medium min-w-[2rem] text-center ${
+          <span className={`min-w-[2rem] text-center font-bold ${
             isTouchMode ? 'text-lg' : 'text-base'
           }`}>
             {item.quantity}
           </span>
           <button
             onClick={() => onUpdateQuantity(index, item.quantity + 1)}
-            className={`btn btn-secondary ${
+            className={`btn btn-secondary bg-white ${
               isTouchMode ? 'touch-friendly' : 'w-8 h-8'
             } flex items-center justify-center`}
           >
@@ -334,11 +334,11 @@ function CartItemCard({ item, index, onUpdateQuantity, onRemove, onApplyDiscount
         <div className="flex items-center space-x-3">
           <button
             onClick={() => setShowDiscountInput(!showDiscountInput)}
-            className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50 transition-colors"
+            className="rounded-2xl p-2 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-800"
           >
             <Percent className="h-4 w-4" />
           </button>
-          <span className={`font-semibold ${isTouchMode ? 'text-base' : 'text-sm'}`}>
+          <span className={`font-black text-slate-900 ${isTouchMode ? 'text-base' : 'text-sm'}`}>
             {currency} {item.subtotal.toFixed(2)}
           </span>
         </div>

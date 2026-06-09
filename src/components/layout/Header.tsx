@@ -40,9 +40,6 @@ export function Header({ currentView, onViewChange }: HeaderProps) {
   };
 
   const cartItemCount = state.cart.reduce((sum, item) => sum + item.quantity, 0);
-  const brandName = state.settings.storeName?.toLowerCase().includes('nextera')
-    ? 'SnapSale'
-    : state.settings.storeName || 'SnapSale';
 
   // Role-based navigation with proper permissions
   const getNavigationItems = () => {
@@ -93,23 +90,16 @@ export function Header({ currentView, onViewChange }: HeaderProps) {
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo and Store Name */}
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-3">
-              {state.settings.storeLogo ? (
-                <img 
-                  src={state.settings.storeLogo} 
-                  alt="Store Logo" 
-                  className="h-9 w-9 lg:h-11 lg:w-11 object-contain rounded-2xl shadow-md ring-1 ring-white"
-                />
-              ) : (
-                <div className="h-9 w-9 lg:h-11 lg:w-11 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25">
-                  <ShoppingCart className="h-4 w-4 lg:h-5 lg:w-5 text-white" />
-                </div>
-              )}
-              <div className="hidden sm:block">
-                <h1 className="text-lg lg:text-xl font-black tracking-tight text-gray-950 truncate max-w-48">
-                  {brandName}
-                </h1>
-                <p className="text-xs font-medium text-blue-600 hidden lg:block">SnapSale POS System</p>
+            <div className="flex items-center gap-2 rounded-3xl bg-white/70 px-2.5 py-1.5 shadow-sm ring-1 ring-white/80">
+              <img
+                src="/snapsale-icon.png"
+                alt="SnapSale"
+                className="h-10 w-10 rounded-2xl object-contain lg:h-11 lg:w-11"
+              />
+              <div className="hidden items-baseline sm:flex">
+                <span className="text-2xl font-black tracking-tight text-blue-700 lg:text-3xl">snap</span>
+                <span className="text-2xl font-black tracking-tight text-emerald-600 lg:text-3xl">$</span>
+                <span className="text-2xl font-black tracking-tight text-emerald-600 lg:text-3xl">ale</span>
               </div>
             </div>
             

@@ -79,10 +79,20 @@ export function ProductGrid({ onAddToCart }: ProductGridProps) {
 
   return (
     <>
-      <div className="flex-1 flex flex-col bg-white">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-xl shadow-slate-200/60">
         {/* Search and Filter Bar */}
-        <div className="p-4 lg:p-6 border-b border-gray-100 bg-white">
-          <div className="flex flex-col lg:flex-row gap-4">
+        <div className="border-b border-slate-100 bg-white p-4 lg:p-5">
+          <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-600">Products</p>
+              <h2 className="text-xl font-black tracking-tight text-slate-950">Choose items</h2>
+            </div>
+            <div className="rounded-full bg-slate-100 px-4 py-2 text-xs font-bold text-slate-600">
+              {filteredProducts.length} visible / {state.products.length} total
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4 lg:flex-row">
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
@@ -90,7 +100,7 @@ export function ProductGrid({ onAddToCart }: ProductGridProps) {
                 placeholder="Search products by name, SKU, or barcode..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className={`input pl-12 ${isTouchMode ? 'h-14 text-lg' : 'h-12'}`}
+                className={`input border-slate-200 bg-slate-50 pl-12 shadow-none focus:bg-white ${isTouchMode ? 'h-14 text-lg' : 'h-12'}`}
               />
             </div>
             
@@ -99,7 +109,7 @@ export function ProductGrid({ onAddToCart }: ProductGridProps) {
               {showLeftScroll && (
                 <button
                   onClick={() => scrollCategories('left')}
-                  className="absolute left-0 z-10 flex items-center justify-center w-8 h-8 bg-white border border-gray-200 rounded-full shadow-sm hover:bg-gray-50 transition-all"
+                  className="absolute left-0 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white shadow-md transition-all hover:bg-slate-50"
                   style={{ transform: 'translateX(-50%)' }}
                 >
                   <ChevronLeft className="h-4 w-4 text-gray-600" />
@@ -109,17 +119,17 @@ export function ProductGrid({ onAddToCart }: ProductGridProps) {
               {/* Categories container */}
               <div 
                 ref={categoriesRef}
-                className="flex overflow-x-auto space-x-2 lg:space-x-3 max-w-xl scrollbar-hide scroll-smooth px-6"
+                className="flex max-w-xl overflow-x-auto scroll-smooth space-x-2 px-6 scrollbar-hide lg:space-x-3"
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               >
                 {categories.map((category) => (
                   <button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
-                    className={`btn whitespace-nowrap transition-all flex-shrink-0 ${
+                  className={`btn flex-shrink-0 whitespace-nowrap transition-all ${
                       selectedCategory === category
                         ? 'btn-primary'
-                        : 'btn-secondary'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                     } ${isTouchMode ? 'btn-lg touch-friendly' : 'btn-md'}`}
                   >
                     {category}
@@ -131,7 +141,7 @@ export function ProductGrid({ onAddToCart }: ProductGridProps) {
               {showRightScroll && (
                 <button
                   onClick={() => scrollCategories('right')}
-                  className="absolute right-0 z-10 flex items-center justify-center w-8 h-8 bg-white border border-gray-200 rounded-full shadow-sm hover:bg-gray-50 transition-all"
+                  className="absolute right-0 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white shadow-md transition-all hover:bg-slate-50"
                   style={{ transform: 'translateX(50%)' }}
                 >
                   <ChevronRight className="h-4 w-4 text-gray-600" />
@@ -142,10 +152,10 @@ export function ProductGrid({ onAddToCart }: ProductGridProps) {
         </div>
 
         {/* Product Grid */}
-        <div className="flex-1 p-4 lg:p-6 overflow-auto">
+        <div className="flex-1 overflow-auto bg-slate-50/70 p-4 lg:p-5">
           {filteredProducts.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-64">
-              <div className="bg-gray-100 p-6 rounded-3xl mb-4">
+              <div className="mb-4 rounded-3xl bg-blue-50 p-6">
                 <Package className="h-16 w-16 text-gray-400" />
               </div>
               <p className="text-gray-500 text-lg font-medium">No products found</p>
@@ -261,31 +271,31 @@ function ProductCard({ product, onAddToCart, isTouchMode, currency }: ProductCar
 
   return (
     <div
-      className={`card card-hover cursor-pointer transition-all duration-200 ${
-        isLowStock && !isOutOfStock ? 'border-orange-200 bg-orange-50' : ''
-      } ${isOutOfStock ? 'border-red-200 bg-red-50 opacity-75' : ''} ${
+      className={`group cursor-pointer overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-lg ${
+        isLowStock && !isOutOfStock ? 'border-orange-200 bg-orange-50/70' : ''
+      } ${isOutOfStock ? 'border-red-200 bg-red-50/80 opacity-75' : ''} ${
         isTouchMode ? 'p-4' : 'p-3'
       }`}
       onClick={() => !isOutOfStock && onAddToCart(product)}
     >
       <div className="flex flex-col h-full">
         {/* Product Image */}
-        <div className={`bg-gray-100 rounded-2xl mb-4 flex items-center justify-center relative overflow-hidden ${
+        <div className={`relative mb-4 flex items-center justify-center overflow-hidden rounded-2xl bg-slate-100 ${
           isTouchMode ? 'h-32' : 'h-24'
         }`}>
           {product.image ? (
             <img 
               src={product.image} 
               alt={product.name} 
-              className="h-full w-full object-cover rounded-2xl" 
+              className="h-full w-full rounded-2xl object-cover transition-transform duration-300 group-hover:scale-105" 
             />
           ) : (
-            <Package className={`text-gray-400 ${isTouchMode ? 'h-10 w-10' : 'h-8 w-8'}`} />
+            <Package className={`text-blue-300 ${isTouchMode ? 'h-10 w-10' : 'h-8 w-8'}`} />
           )}
           
           {/* Weight-based indicator */}
           {product.isWeightBased && (
-            <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded-full flex items-center space-x-1">
+            <div className="absolute left-2 top-2 flex items-center space-x-1 rounded-full bg-blue-600 px-2 py-1 text-xs font-semibold text-white shadow-lg shadow-blue-500/20">
               <Scale className="h-3 w-3" />
               <span>{product.unit}</span>
             </div>
@@ -293,13 +303,13 @@ function ProductCard({ product, onAddToCart, isTouchMode, currency }: ProductCar
           
           {/* Stock Status Badge */}
           {isOutOfStock && (
-            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-2xl">
+            <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/50">
               <span className="text-white font-semibold text-sm">Out of Stock</span>
             </div>
           )}
           
           {isLowStock && !isOutOfStock && (
-            <div className="absolute bottom-2 right-2 bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+            <div className="absolute bottom-2 right-2 rounded-full bg-orange-500 px-2 py-1 text-xs font-semibold text-white shadow-lg shadow-orange-500/20">
               Low Stock
             </div>
           )}
@@ -313,16 +323,16 @@ function ProductCard({ product, onAddToCart, isTouchMode, currency }: ProductCar
             {product.name}
           </h3>
           
-          <p className={`text-gray-500 ${isTouchMode ? 'text-sm' : 'text-xs'}`}>
+          <p className={`font-medium text-gray-400 ${isTouchMode ? 'text-sm' : 'text-xs'}`}>
             SKU: {product.sku}
           </p>
           
-          <div className="flex items-center justify-between">
+          <div className="flex items-end justify-between gap-3">
             <span className={`font-bold text-blue-600 ${isTouchMode ? 'text-lg' : 'text-base'}`}>
               {currency} {product.isWeightBased ? product.pricePerUnit?.toFixed(2) : product.price.toFixed(2)}
               {product.isWeightBased && <span className="text-xs text-gray-500">/{product.unit}</span>}
             </span>
-            <span className={`text-gray-500 ${
+            <span className={`rounded-full bg-slate-100 px-2 py-1 text-right text-gray-500 ${
               isLowStock ? 'text-orange-600 font-medium' : ''
             } ${isTouchMode ? 'text-sm' : 'text-xs'}`}>
               {shouldTrackInventory 
@@ -340,7 +350,7 @@ function ProductCard({ product, onAddToCart, isTouchMode, currency }: ProductCar
             if (!isOutOfStock) onAddToCart(product);
           }}
           disabled={isOutOfStock}
-          className={`btn btn-primary w-full mt-4 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center space-x-2 ${
+          className={`mt-4 flex w-full items-center justify-center space-x-2 rounded-2xl bg-slate-950 font-bold text-white transition-all hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300 ${
             isTouchMode ? 'btn-lg touch-friendly' : 'btn-md'
           }`}
         >
