@@ -3,8 +3,9 @@ import { X, User, Mail, Lock, Shield, Crown } from 'lucide-react';
 import { User as UserType } from '../../types';
 import { useApp } from '../../context/SupabaseAppContext';
 import { usersService } from '../../lib/services';
-import { supabaseAdmin } from '../../lib/supabase';
+// import { supabaseAdmin } from '../../lib/supabase';
 import { swalConfig } from '../../lib/sweetAlert';
+import { supabase } from '../../lib/supabase';
 
 interface UserModalProps {
   isOpen: boolean;
@@ -79,7 +80,7 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
         }
 
         // First create the auth user
-        const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
           email: formData.email,
           password: formData.password,
           email_confirm: true
@@ -88,7 +89,7 @@ export function UserModal({ isOpen, onClose, user }: UserModalProps) {
         if (authError) throw authError;
 
         // Then create the user profile directly in the database
-        const { data: profileData, error: profileError } = await supabaseAdmin
+        const { data: profileData, error: profileError } = await supabase
           .from('users')
           .insert({
             id: authData.user.id,
